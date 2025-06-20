@@ -18,7 +18,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     req.body as Payload
 
   // Load the JSON file
-  const dataPath = path.join(process.cwd(), 'data', 'sampleData.json')
+  const dataPath = path.join(process.cwd(), 'data', 'datasets.json')
   const raw = fs.readFileSync(dataPath, 'utf-8')
   const categories = JSON.parse(raw) as Category[]
 

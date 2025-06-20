@@ -1,12 +1,38 @@
+// pages/index.tsx
 import { useState } from 'react'
 import TreeBrowser from '../components/TreeBrowser'
 import DatasetFilter from '../components/DatasetFilter'
 import DatasetView from '../components/DatasetView'
-import sampleCategories from '../data/sampleData.json'
+import categoryTree from '../data/categories.json'
+import datasets from '../data/datasets.json'
 import { Category, Dataset } from '../types'
 
+// structure of our JSON tree before merging
+interface CategoryNode {
+  id: string
+  label: string
+  datasetIds: string[]
+  children?: CategoryNode[]
+}
+
+// build full Category[] from IDs + datasets.json
+function buildCategories(nodes: CategoryNode[]): Category[] {
+  return nodes.map(n => ({
+    id: n.id,
+    label: n.label,
+    datasets: n.datasetIds.map(id => {
+      const ds = datasets.find(d => d.id === id)
+      if (!ds) throw new Error(`Dataset ${id} not found`)
+      return ds
+    }),
+    children: n.children ? buildCategories(n.children) : undefined,
+  }))
+}
+
 export default function Home() {
-  const [categories, setCategories] = useState<Category[]>(sampleCategories)
+  const [categories, setCategories] = useState<Category[]>(() =>
+    buildCategories(categoryTree as CategoryNode[])
+  )
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null)
 
@@ -19,7 +45,9 @@ export default function Home() {
     const recurse = (cats: Category[]): Category[] =>
       cats.map(cat => ({
         ...cat,
-        datasets: cat.datasets.map(ds => ds.id === id ? fn(ds) : ds),
+        datasets: cat.datasets.map(ds =>
+          ds.id === id ? fn(ds) : ds
+        ),
         children: cat.children ? recurse(cat.children) : undefined,
       }))
     setCategories(prev => recurse(prev))
@@ -31,12 +59,18 @@ export default function Home() {
   }
   const handleSelectDataset = (ds: Dataset) => setSelectedDataset(ds)
 
-  const handleAddKeyword = (t: string) => setKeywordList(list => list.includes(t) ? list : [...list, t])
-  const handleAddInclusion = (t: string) => setInclusionList(list => list.includes(t) ? list : [...list, t])
-  const handleAddExclusion = (t: string) => setExclusionList(list => list.includes(t) ? list : [...list, t])
-  const handleRemoveKeyword = (t: string) => setKeywordList(list => list.filter(x => x !== t))
-  const handleRemoveInclusion = (t: string) => setInclusionList(list => list.filter(x => x !== t))
-  const handleRemoveExclusion = (t: string) => setExclusionList(list => list.filter(x => x !== t))
+  const handleAddKeyword = (t: string) =>
+    setKeywordList(list => list.includes(t) ? list : [...list, t])
+  const handleAddInclusion = (t: string) =>
+    setInclusionList(list => list.includes(t) ? list : [...list, t])
+  const handleAddExclusion = (t: string) =>
+    setExclusionList(list => list.includes(t) ? list : [...list, t])
+  const handleRemoveKeyword = (t: string) =>
+    setKeywordList(list => list.filter(x => x !== t))
+  const handleRemoveInclusion = (t: string) =>
+    setInclusionList(list => list.filter(x => x !== t))
+  const handleRemoveExclusion = (t: string) =>
+    setExclusionList(list => list.filter(x => x !== t))
   const handleClearKeywords = () => setKeywordList([])
   const handleClearInclusion = () => setInclusionList([])
   const handleClearExclusion = () => setExclusionList([])
@@ -48,13 +82,13 @@ export default function Home() {
     setExclusionList(selectedDataset.exclusionTerms ?? [])
     setIsAnnotating(true)
   }
-
   const handleCancelAnnotation = () => setIsAnnotating(false)
 
   const handleSubmitAnnotations = async () => {
     if (!selectedDataset) return
     await fetch('/api/save-annotations', {
-      method: 'POST', headers:{'Content-Type':'application/json'},
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         datasetId: selectedDataset.id,
         keywords: keywordList,
@@ -63,7 +97,10 @@ export default function Home() {
       })
     })
     updateDataset(selectedDataset.id, ds => ({
-      ...ds, keywords: keywordList, inclusionTerms: inclusionList, exclusionTerms: exclusionList
+      ...ds,
+      keywords: keywordList,
+      inclusionTerms: inclusionList,
+      exclusionTerms: exclusionList
     }))
     setIsAnnotating(false)
   }
@@ -71,6 +108,7 @@ export default function Home() {
   return (
     <div className="grid grid-cols-[1fr_2fr_2fr] h-screen">
       <TreeBrowser
+        categories={categories}
         selectedCategory={selectedCategory}
         onSelectCategory={handleSelectCategory}
         onAddKeyword={handleAddKeyword}

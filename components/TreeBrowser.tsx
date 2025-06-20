@@ -4,6 +4,7 @@ import 'react-treeview/react-treeview.css'
 import { Category } from '../types'
 
 interface TreeBrowserProps {
+  categories: Category[]
   selectedCategory: Category | null
   onSelectCategory: (cat: Category) => void
   onAddKeyword: (term: string) => void
@@ -12,6 +13,7 @@ interface TreeBrowserProps {
 }
 
 export default function TreeBrowser({
+  categories,
   selectedCategory,
   onSelectCategory,
   onAddKeyword,
@@ -20,8 +22,6 @@ export default function TreeBrowser({
 }: TreeBrowserProps) {
   const [search, setSearch] = useState('')
   const [collapsedMap, setCollapsedMap] = useState<Record<string, boolean>>({})
-
-  const sampleCategories = useMemo(() => require('../data/sampleData.json') as Category[], [])
 
   const allNodeIds = useMemo(() => {
     const ids: string[] = []
@@ -33,9 +33,9 @@ export default function TreeBrowser({
         }
       })
     }
-    traverse(sampleCategories)
+    traverse(categories)
     return ids
-  }, [sampleCategories])
+  }, [categories])
 
   const collapseAll = () => {
     const m: Record<string, boolean> = {}
@@ -49,7 +49,7 @@ export default function TreeBrowser({
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
-    if (!term) return sampleCategories
+    if (!term) return categories
     const recurse = (nodes: Category[]): Category[] =>
       nodes.reduce<Category[]>((acc, node) => {
         const children = node.children ?? []
@@ -62,8 +62,8 @@ export default function TreeBrowser({
         }
         return acc
       }, [])
-    return recurse(sampleCategories)
-  }, [search, sampleCategories])
+    return recurse(categories)
+  }, [search, categories])
 
   const renderTree = (nodes: Category[]) =>
     nodes.map(node => {
@@ -101,22 +101,36 @@ export default function TreeBrowser({
       <div className="flex space-x-2 mb-4">
         <button
           className="px-3 py-1 border rounded bg-indigo-500 text-white hover:bg-indigo-600"
-          onClick={() => selectedCategory && onAddKeyword(selectedCategory.label)}
-        >Keyword</button>
+          onClick={() =>
+            selectedCategory && onAddKeyword(selectedCategory.label)
+          }
+        >
+          Keyword
+        </button>
         <button
           className="px-3 py-1 border rounded bg-green-500 text-white hover:bg-green-600"
-          onClick={() => selectedCategory && onAddInclusion(selectedCategory.label)}
-        >Inclusion Criterion</button>
+          onClick={() =>
+            selectedCategory && onAddInclusion(selectedCategory.label)
+          }
+        >
+          Inclusion Criterion
+        </button>
         <button
           className="px-3 py-1 border rounded bg-red-500 text-white hover:bg-red-600"
-          onClick={() => selectedCategory && onAddExclusion(selectedCategory.label)}
-        >Exclusion Criterion</button>
+          onClick={() =>
+            selectedCategory && onAddExclusion(selectedCategory.label)
+          }
+        >
+          Exclusion Criterion
+        </button>
       </div>
       <div className="flex items-center mb-4 space-x-2">
         <button
           className="h-10 px-3 border rounded hover:bg-gray-100 flex items-center justify-center"
           onClick={collapseAll}
-        >Collapse All</button>
+        >
+          Collapse All
+        </button>
         <input
           className="flex-1 h-10 px-2 border rounded"
           placeholder="Search categories"

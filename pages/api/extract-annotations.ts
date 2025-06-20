@@ -12,7 +12,7 @@ export default async function handler(
   }
 
   // Full path to your script
-  const scriptPath = path.join(process.cwd(), 'extract_annotations.py')
+  const scriptPath = path.join(process.cwd(), 'scripts', 'extract_annotations.py')
 
   // Wrap in a promise so Next.js waits for it
   await new Promise<void>((resolve) => {

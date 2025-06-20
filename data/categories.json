@@ -1,0 +1,60 @@
+[
+  {
+    "id": "mri",
+    "label": "MRI",
+    "datasetIds": [],
+    "children": [
+      {
+        "id": "structural-mri",
+        "label": "Structural MRI",
+        "datasetIds": [],
+        "children": [
+          {
+            "id": "t1-weighted",
+            "label": "T1-weighted",
+            "datasetIds": ["ds-mri-t1-1", "ds-mri-t1-2"]
+          },
+          {
+            "id": "t2-weighted",
+            "label": "T2-weighted",
+            "datasetIds": ["ds-mri-t2-1"]
+          }
+        ]
+      },
+      {
+        "id": "functional-mri",
+        "label": "Functional MRI",
+        "datasetIds": [],
+        "children": [
+          {
+            "id": "resting-fmri",
+            "label": "Resting-state fMRI",
+            "datasetIds": ["ds-fmri-rest-1"]
+          },
+          {
+            "id": "task-fmri",
+            "label": "Task-based fMRI",
+            "datasetIds": ["ds-fmri-task-1"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pet",
+    "label": "PET",
+    "datasetIds": [],
+    "children": [
+      {
+        "id": "amyloid-pet",
+        "label": "Amyloid PET",
+        "datasetIds": ["ds-pet-amy-1"]
+      },
+      {
+        "id": "fdg-pet",
+        "label": "FDG-PET",
+        "datasetIds": ["ds-pet-fdg-1"]
+      }
+    ]
+  }
+]
