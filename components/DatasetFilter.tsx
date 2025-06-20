@@ -1,5 +1,15 @@
+// components/DatasetFilter.tsx
 import { useState, useEffect } from 'react'
 import { Category, Dataset } from '../types'
+
+interface AnnotationItem {
+  text: string
+  subcategory: string
+  term: string
+  keyword: boolean
+  inclusion: boolean
+  exclusion: boolean
+}
 
 interface DatasetFilterProps {
   categories: Category[]
@@ -42,6 +52,17 @@ export default function DatasetFilter({
   onAddInclusion,
   onAddExclusion,
 }: DatasetFilterProps) {
+  // Build subcategory -> term list map
+  const subTermsMap: Record<string, string[]> = {}
+  categories.forEach(cat => {
+    cat.children?.forEach(sub => {
+      subTermsMap[sub.label] = sub.children?.map(term => term.label) || []
+    })
+  })
+
+  // List of all second-level subcategories
+  const subcategories = Object.keys(subTermsMap)
+
   // Flatten all datasets
   const allDatasets: Dataset[] = []
   const collect = (cats: Category[]) => {
@@ -52,10 +73,11 @@ export default function DatasetFilter({
   }
   collect(categories)
 
-  // Determine if any filter is active
-  const hasFilters = keywordList.length > 0 || inclusionList.length > 0 || exclusionList.length > 0
-
-  // Filter datasets
+  // Apply filters
+  const hasFilters =
+    keywordList.length > 0 ||
+    inclusionList.length > 0 ||
+    exclusionList.length > 0
   const filtered = hasFilters
     ? allDatasets.filter(ds =>
         keywordList.every(k => ds.keywords?.includes(k)) &&
@@ -64,120 +86,271 @@ export default function DatasetFilter({
       )
     : allDatasets
 
-  // Local state
+  // Local state for annotation mode
   const [note, setNote] = useState('')
-  const [extract, setExtract] = useState<any>(null)
+  const [extract, setExtract] = useState<AnnotationItem[]>([])
 
-  // Clear on annotate
   useEffect(() => {
     if (isAnnotating) {
       setNote('')
-      setExtract(null)
+      setExtract([])
     }
   }, [isAnnotating])
 
+  // Fetch extract from API
   const handleExtract = async () => {
     try {
       const res = await fetch('/api/extract-annotations', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ text: note })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: note }),
       })
-      const text = await res.text()
-      if (!res.ok) { setExtract({ error: text }); return }
-      let data
-      try { data = JSON.parse(text) } catch { setExtract({ error: text }); return }
+      const data = await res.json()
       setExtract(data.result)
     } catch (e) {
-      setExtract({ error: 'Network error' })
+      console.error('Extraction error', e)
     }
   }
 
-  // Suggested lists filter
-  const suggestedKeywords = extract?.keywords?.filter((t: string) => !keywordList.includes(t)) || []
-  const suggestedInclusions = extract?.inclusionTerms?.filter((t: string) => !inclusionList.includes(t)) || []
-  const suggestedExclusions = extract?.exclusionTerms?.filter((t: string) => !exclusionList.includes(t)) || []
+  // Toggle boolean fields
+  const toggleKeyword = (i: number) => {
+    const c = [...extract]
+    c[i].keyword = !c[i].keyword
+    setExtract(c)
+  }
+  const toggleInclusion = (i: number) => {
+    const c = [...extract]
+    c[i].inclusion = !c[i].inclusion
+    setExtract(c)
+  }
+  const toggleExclusion = (i: number) => {
+    const c = [...extract]
+    c[i].exclusion = !c[i].exclusion
+    setExtract(c)
+  }
+
+  // Change term
+  const handleTermChange = (i: number, v: string) => {
+    const c = [...extract]
+    c[i].term = v
+    setExtract(c)
+  }
+
+  // Change subcategory and reset term if needed
+  const handleSubcategoryChange = (i: number, v: string) => {
+    const c = [...extract]
+    c[i].subcategory = v
+    const terms = subTermsMap[v] || []
+    c[i].term = terms.includes(c[i].term) ? c[i].term : terms[0] || ''
+    setExtract(c)
+  }
 
   return (
     <div className="p-4 border-r">
-      {/* Filters */}
+      {/* Top filter lists */}
       <div className="grid grid-cols-3 gap-4 mb-4">
+        {/* Keywords */}
         <div>
           <div className="flex justify-between mb-2">
             <span className="font-semibold">Keywords:</span>
-            <button onClick={onClearKeywords} className="text-sm px-2 py-0.5 border rounded bg-indigo-100 hover:bg-indigo-200">Clear</button>
+            <button
+              onClick={onClearKeywords}
+              className="text-sm px-2 py-0.5 border rounded bg-indigo-100 hover:bg-indigo-200"
+            >
+              Clear
+            </button>
           </div>
-          {keywordList.length ? keywordList.map(t => (
-            <span key={t} onClick={() => onRemoveKeyword(t)} className="block mb-2 px-2 py-0.5 bg-indigo-100 rounded cursor-pointer">{t}</span>
-          )) : <div className="text-gray-500">None</div>}
+          {keywordList.length ? (
+            keywordList.map(t => (
+              <span
+                key={t}
+                onClick={() => onRemoveKeyword(t)}
+                className="block mb-2 px-2 py-0.5 bg-indigo-100 rounded cursor-pointer"
+              >
+                {t}
+              </span>
+            ))
+          ) : (
+            <div className="text-gray-500">None</div>
+          )}
         </div>
+        {/* Inclusion */}
         <div>
           <div className="flex justify-between mb-2">
-            <span className="font-semibold">Inclusion:</span>
-            <button onClick={onClearInclusion} className="text-sm px-2 py-0.5 border rounded bg-green-100 hover:bg-green-200">Clear</button>
+            <span className="font-semibold">Inclusion Terms:</span>
+            <button
+              onClick={onClearInclusion}
+              className="text-sm px-2 py-0.5 border rounded bg-green-100 hover:bg-green-200"
+            >
+              Clear
+            </button>
           </div>
-          {inclusionList.length ? inclusionList.map(t => (
-            <span key={t} onClick={() => onRemoveInclusion(t)} className="block mb-2 px-2 py-0.5 bg-green-100 rounded cursor-pointer">{t}</span>
-          )) : <div className="text-gray-500">None</div>}
+          {inclusionList.length ? (
+            inclusionList.map(t => (
+              <span
+                key={t}
+                onClick={() => onRemoveInclusion(t)}
+                className="block mb-2 px-2 py-0.5 bg-green-100 rounded cursor-pointer"
+              >
+                {t}
+              </span>
+            ))
+          ) : (
+            <div className="text-gray-500">None</div>
+          )}
         </div>
+        {/* Exclusion */}
         <div>
           <div className="flex justify-between mb-2">
-            <span className="font-semibold">Exclusion:</span>
-            <button onClick={onClearExclusion} className="text-sm px-2 py-0.5 border rounded bg-red-100 hover:bg-red-200">Clear</button>
+            <span className="font-semibold">Exclusion Terms:</span>
+            <button
+              onClick={onClearExclusion}
+              className="text-sm px-2 py-0.5 border rounded bg-red-100 hover:bg-red-200"
+            >
+              Clear
+            </button>
           </div>
-          {exclusionList.length ? exclusionList.map(t => (
-            <span key={t} onClick={() => onRemoveExclusion(t)} className="block mb-2 px-2 py-0.5 bg-red-100 rounded cursor-pointer">{t}</span>
-          )) : <div className="text-gray-500">None</div>}
+          {exclusionList.length ? (
+            exclusionList.map(t => (
+              <span
+                key={t}
+                onClick={() => onRemoveExclusion(t)}
+                className="block mb-2 px-2 py-0.5 bg-red-100 rounded cursor-pointer"
+              >
+                {t}
+              </span>
+            ))
+          ) : (
+            <div className="text-gray-500">None</div>
+          )}
         </div>
       </div>
 
       {isAnnotating ? (
         <>
-          <div className="flex space-x-4 justify-center mb-4">
-            <button onClick={onSubmitAnnotations} className="px-4 py-2 bg-blue-500 text-white rounded">Submit Annotations</button>
-            <button onClick={onCancelAnnotation} className="px-4 py-2 bg-gray-300 rounded">Cancel</button>
+          {/* Submit & Cancel */}
+          <div className="flex justify-center mb-4 space-x-4">
+            <button
+              onClick={onSubmitAnnotations}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Submit Annotations
+            </button>
+            <button
+              onClick={onCancelAnnotation}
+              className="px-4 py-2 bg-gray-300 rounded"
+            >
+              Cancel
+            </button>
           </div>
+
+          {/* Abstract input */}
           <textarea
             value={note}
             onChange={e => setNote(e.target.value)}
             placeholder="Enter full paper abstract..."
             className="w-full h-40 border rounded p-2 mb-4"
           />
+
+          {/* Extract button */}
           <div className="flex justify-center mb-4">
-            <button onClick={handleExtract} className="px-4 py-2 bg-gray-200 rounded">Extract annotations</button>
+            <button
+              onClick={handleExtract}
+              className="px-4 py-2 bg-gray-200 rounded"
+            >
+              Extract annotations
+            </button>
           </div>
-          {extract && (
-            <textarea readOnly value={JSON.stringify(extract, null, 2)} className="w-full h-40 border rounded p-2 mb-4" />
-          )}
-          {extract && (
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <div className="font-semibold mb-2">Suggested Keywords:</div>
-                {suggestedKeywords.length ? suggestedKeywords.map((t: string) => (
-                  <span key={t} onClick={() => onAddKeyword(t)} className="block mb-2 px-2 py-0.5 bg-indigo-200 rounded cursor-pointer">{t}</span>
-                )) : <div className="text-gray-500">None</div>}
-              </div>
-              <div>
-                <div className="font-semibold mb-2">Suggested Inclusion:</div>
-                {suggestedInclusions.length ? suggestedInclusions.map((t: string) => (
-                  <span key={t} onClick={() => onAddInclusion(t)} className="block mb-2 px-2 py-0.5 bg-green-200 rounded cursor-pointer">{t}</span>
-                )) : <div className="text-gray-500">None</div>}
-              </div>
-              <div>
-                <div className="font-semibold mb-2">Suggested Exclusion:</div>
-                {suggestedExclusions.length ? suggestedExclusions.map((t: string) => (
-                  <span key={t} onClick={() => onAddExclusion(t)} className="block mb-2 px-2 py-0.5 bg-red-200 rounded cursor-pointer">{t}</span>
-                )) : <div className="text-gray-500">None</div>}
-              </div>
-            </div>
-          )}
+
+          {/* Annotation table */}
+          <table className="w-full table-auto border-collapse">
+            <thead>
+              <tr>
+                <th className="border px-2 py-1 bg-gray-100">Text</th>
+                <th className="border px-2 py-1 bg-gray-100">Subcategory</th>
+                <th className="border px-2 py-1 bg-gray-100">Term</th>
+                <th className="border px-2 py-1 bg-gray-100">Keyword</th>
+                <th className="border px-2 py-1 bg-gray-100">Inclusion</th>
+                <th className="border px-2 py-1 bg-gray-100">Exclusion</th>
+              </tr>
+            </thead>
+            <tbody>
+              {extract.length ? (
+                extract.map((item, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50">
+                    <td className="border px-2 py-1">{item.text}</td>
+                    <td className="border px-2 py-1">
+                      <select
+                        value={item.subcategory}
+                        onChange={e => handleSubcategoryChange(idx, e.target.value)}
+                        className="border rounded px-1 py-0.5"
+                      >
+                        {subcategories.map(sub => (
+                          <option key={sub} value={sub}>
+                            {sub}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="border px-2 py-1">
+                      <select
+                        value={item.term}
+                        onChange={e => handleTermChange(idx, e.target.value)}
+                        className="border rounded px-1 py-0.5"
+                      >
+                        {(subTermsMap[item.subcategory] || []).map(opt => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="border px-2 py-1 text-center">
+                      <input
+                        type="checkbox"
+                        checked={item.keyword}
+                        onChange={() => toggleKeyword(idx)}
+                      />
+                    </td>
+                    <td className="border px-2 py-1 text-center">
+                      <input
+                        type="checkbox"
+                        checked={item.inclusion}
+                        onChange={() => toggleInclusion(idx)}
+                      />
+                    </td>
+                    <td className="border px-2 py-1 text-center">
+                      <input
+                        type="checkbox"
+                        checked={item.exclusion}
+                        onChange={() => toggleExclusion(idx)}
+                      />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="text-center py-4 text-gray-500">
+                    No annotations extracted yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </>
       ) : (
         <ul>
           {filtered.map(ds => (
-            <li key={ds.id} onClick={() => onSelectDataset(ds)} className="cursor-pointer py-1 hover:bg-gray-100">{ds.label}</li>
+            <li
+              key={ds.id}
+              onClick={() => onSelectDataset(ds)}
+              className="cursor-pointer py-1 hover:bg-gray-100"
+            >
+              {ds.label}
+            </li>
           ))}
         </ul>
       )}
     </div>
-)
+  )
 }
