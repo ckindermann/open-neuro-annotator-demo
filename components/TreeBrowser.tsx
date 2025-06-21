@@ -1,15 +1,15 @@
 import { useState, useMemo } from 'react'
 import TreeView from 'react-treeview'
 import 'react-treeview/react-treeview.css'
-import { Category } from '../types'
+import { Category, Annotation } from '../types'
 
 interface TreeBrowserProps {
   categories: Category[]
   selectedCategory: Category | null
   onSelectCategory: (cat: Category) => void
-  onAddKeyword: (term: string) => void
-  onAddInclusion: (term: string) => void
-  onAddExclusion: (term: string) => void
+  onAddKeyword: (ann: Annotation) => void
+  onAddInclusion: (ann: Annotation) => void
+  onAddExclusion: (ann: Annotation) => void
 }
 
 export default function TreeBrowser({
@@ -27,7 +27,7 @@ export default function TreeBrowser({
     const ids: string[] = []
     const traverse = (nodes: Category[]) => {
       nodes.forEach(node => {
-        if (node.children?.length) {
+        if (node.children && node.children.length > 0) {
           ids.push(node.id)
           traverse(node.children)
         }
@@ -50,6 +50,7 @@ export default function TreeBrowser({
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase()
     if (!term) return categories
+
     const recurse = (nodes: Category[]): Category[] =>
       nodes.reduce<Category[]>((acc, node) => {
         const children = node.children ?? []
@@ -62,16 +63,17 @@ export default function TreeBrowser({
         }
         return acc
       }, [])
+
     return recurse(categories)
   }, [search, categories])
 
   const renderTree = (nodes: Category[]) =>
     nodes.map(node => {
-      const hasChildren = node.children && node.children.length > 0
+      const hasChildren = !!node.children?.length
       const isCollapsed = collapsedMap[node.id] ?? false
       const isSelected = selectedCategory?.id === node.id
 
-      const label = (
+      const labelEl = (
         <span
           className={`cursor-pointer inline-flex items-center px-1 py-0.5 rounded ${
             isSelected ? 'bg-blue-100 font-semibold' : ''
@@ -88,7 +90,7 @@ export default function TreeBrowser({
       return (
         <TreeView
           key={node.id}
-          nodeLabel={label}
+          nodeLabel={labelEl}
           collapsed={hasChildren ? isCollapsed : true}
         >
           {hasChildren && !isCollapsed && renderTree(node.children!)}
@@ -101,29 +103,48 @@ export default function TreeBrowser({
       <div className="flex space-x-2 mb-4">
         <button
           className="px-3 py-1 border rounded bg-indigo-500 text-white hover:bg-indigo-600"
-          onClick={() =>
-            selectedCategory && onAddKeyword(selectedCategory.label)
-          }
+          onClick={() => {
+            if (!selectedCategory) return
+            onAddKeyword({
+              id: selectedCategory.id,
+              label: selectedCategory.label,
+              comment: '',
+              text: '',
+            })
+          }}
         >
           Keyword
         </button>
         <button
           className="px-3 py-1 border rounded bg-green-500 text-white hover:bg-green-600"
-          onClick={() =>
-            selectedCategory && onAddInclusion(selectedCategory.label)
-          }
+          onClick={() => {
+            if (!selectedCategory) return
+            onAddInclusion({
+              id: selectedCategory.id,
+              label: selectedCategory.label,
+              comment: '',
+              text: '',
+            })
+          }}
         >
-          Inclusion Criterion
+          Inclusion
         </button>
         <button
           className="px-3 py-1 border rounded bg-red-500 text-white hover:bg-red-600"
-          onClick={() =>
-            selectedCategory && onAddExclusion(selectedCategory.label)
-          }
+          onClick={() => {
+            if (!selectedCategory) return
+            onAddExclusion({
+              id: selectedCategory.id,
+              label: selectedCategory.label,
+              comment: '',
+              text: '',
+            })
+          }}
         >
-          Exclusion Criterion
+          Exclusion
         </button>
       </div>
+
       <div className="flex items-center mb-4 space-x-2">
         <button
           className="h-10 px-3 border rounded hover:bg-gray-100 flex items-center justify-center"
@@ -138,6 +159,7 @@ export default function TreeBrowser({
           onChange={e => setSearch(e.target.value)}
         />
       </div>
+
       <div className="overflow-auto flex-1">
         {renderTree(filtered)}
       </div>

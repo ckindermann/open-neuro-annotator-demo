@@ -3,9 +3,17 @@
     "id": "ds-mri-t1-1",
     "label": "High-Res T1",
     "description": "High resolution T1-weighted anatomical scan.",
-    "keywords": ["MRI", "Structural MRI", "T1-weighted"],
-    "inclusionTerms": ["T1-weighted"],
-    "exclusionTerms": ["Task-based fMRI"],
+    "keywords": [
+      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
+      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" },
+      { "id": "t1-weighted", "label": "T1-weighted", "comment": "", "text": "" }
+    ],
+    "inclusionTerms": [
+      { "id": "t1-weighted", "label": "T1-weighted", "comment": "", "text": "" }
+    ],
+    "exclusionTerms": [
+      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
+    ],
     "authors": ["Smith, John", "Doe, Alice"],
     "accessionNumber": "ACC-00001",
     "doi": "10.1000/xyz123",
@@ -15,9 +23,17 @@
     "id": "ds-mri-t1-2",
     "label": "Standard T1",
     "description": "Standard clinical T1 scan.",
-    "keywords": ["MRI", "Structural MRI", "T1-weighted"],
-    "inclusionTerms": ["Structural MRI"],
-    "exclusionTerms": ["Resting-state fMRI"],
+    "keywords": [
+      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
+      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" },
+      { "id": "t1-weighted", "label": "T1-weighted", "comment": "", "text": "" }
+    ],
+    "inclusionTerms": [
+      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" }
+    ],
+    "exclusionTerms": [
+      { "id": "resting-fmri", "label": "Resting-state fMRI", "comment": "", "text": "" }
+    ],
     "authors": ["Lee, Katie", "Zhang, Wei"],
     "accessionNumber": "ACC-00002",
     "doi": "10.1000/xyz124",
@@ -27,9 +43,17 @@
     "id": "ds-mri-t2-1",
     "label": "Fluid-sensitive T2",
     "description": "T2-weighted scan emphasizing fluid contrast.",
-    "keywords": ["MRI", "Structural MRI", "T2-weighted"],
-    "inclusionTerms": ["T2-weighted"],
-    "exclusionTerms": ["Task-based fMRI"],
+    "keywords": [
+      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
+      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" },
+      { "id": "t2-weighted", "label": "T2-weighted", "comment": "", "text": "" }
+    ],
+    "inclusionTerms": [
+      { "id": "t2-weighted", "label": "T2-weighted", "comment": "", "text": "" }
+    ],
+    "exclusionTerms": [
+      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
+    ],
     "authors": ["Nguyen, Minh"],
     "accessionNumber": "ACC-00003",
     "doi": "10.1000/xyz125",
@@ -39,9 +63,17 @@
     "id": "ds-fmri-rest-1",
     "label": "Rest fMRI Session",
     "description": "Resting state BOLD fMRI run.",
-    "keywords": ["MRI", "Functional MRI", "Resting-state fMRI"],
-    "inclusionTerms": ["Resting-state fMRI"],
-    "exclusionTerms": ["T1-weighted"],
+    "keywords": [
+      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
+      { "id": "functional-mri", "label": "Functional MRI", "comment": "", "text": "" },
+      { "id": "resting-fmri", "label": "Resting-state fMRI", "comment": "", "text": "" }
+    ],
+    "inclusionTerms": [
+      { "id": "resting-fmri", "label": "Resting-state fMRI", "comment": "", "text": "" }
+    ],
+    "exclusionTerms": [
+      { "id": "t1-weighted", "label": "T1-weighted", "comment": "", "text": "" }
+    ],
     "authors": ["Garcia, Maria"],
     "accessionNumber": "ACC-00004",
     "doi": "10.1000/xyz126",
@@ -51,9 +83,17 @@
     "id": "ds-fmri-task-1",
     "label": "Visual Task fMRI",
     "description": "fMRI during visual stimulation task.",
-    "keywords": ["MRI", "Functional MRI", "Task-based fMRI"],
-    "inclusionTerms": ["Task-based fMRI"],
-    "exclusionTerms": ["Structural MRI"],
+    "keywords": [
+      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
+      { "id": "functional-mri", "label": "Functional MRI", "comment": "", "text": "" },
+      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
+    ],
+    "inclusionTerms": [
+      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
+    ],
+    "exclusionTerms": [
+      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" }
+    ],
     "authors": ["Kumar, Raj", "Patel, Sunita"],
     "accessionNumber": "ACC-00005",
     "doi": "10.1000/xyz127",
@@ -63,9 +103,16 @@
     "id": "ds-pet-amy-1",
     "label": "Amyloid Tracer Scan",
     "description": "PET scan using amyloid tracer.",
-    "keywords": ["PET", "Amyloid PET"],
-    "inclusionTerms": ["Amyloid PET"],
-    "exclusionTerms": ["Task-based fMRI"],
+    "keywords": [
+      { "id": "pet", "label": "PET", "comment": "", "text": "" },
+      { "id": "amyloid-pet", "label": "Amyloid PET", "comment": "", "text": "" }
+    ],
+    "inclusionTerms": [
+      { "id": "amyloid-pet", "label": "Amyloid PET", "comment": "", "text": "" }
+    ],
+    "exclusionTerms": [
+      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
+    ],
     "authors": ["Sato, Yuki"],
     "accessionNumber": "ACC-00006",
     "doi": "10.1000/xyz128",
@@ -75,9 +122,16 @@
     "id": "ds-pet-fdg-1",
     "label": "FDG Metabolism Scan",
     "description": "FDG-PET metabolic imaging.",
-    "keywords": ["PET", "FDG-PET"],
-    "inclusionTerms": ["FDG-PET"],
-    "exclusionTerms": ["Amyloid PET"],
+    "keywords": [
+      { "id": "pet", "label": "PET", "comment": "", "text": "" },
+      { "id": "fdg-pet", "label": "FDG-PET", "comment": "", "text": "" }
+    ],
+    "inclusionTerms": [
+      { "id": "fdg-pet", "label": "FDG-PET", "comment": "", "text": "" }
+    ],
+    "exclusionTerms": [
+      { "id": "amyloid-pet", "label": "Amyloid PET", "comment": "", "text": "" }
+    ],
     "authors": ["O'Neil, Liam"],
     "accessionNumber": "ACC-00007",
     "doi": "10.1000/xyz129",

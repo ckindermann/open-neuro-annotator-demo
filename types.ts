@@ -1,14 +1,21 @@
+export interface Annotation {
+  id: string
+  label: string
+  comment: string
+  text: string
+}
+
 export interface Dataset {
   id: string
   label: string
   description: string
-  keywords?: string[]
-  inclusionTerms?: string[]
-  exclusionTerms?: string[]
-   authors?: string[]
-   accessionNumber?: string
-   doi?: string
-   license?: string
+  keywords?: Annotation[]
+  inclusionTerms?: Annotation[]
+  exclusionTerms?: Annotation[]
+  authors?: string[]
+  accessionNumber?: string
+  doi?: string
+  license?: string
 }
 
 export interface Category {

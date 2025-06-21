@@ -1,6 +1,6 @@
 // components/DatasetFilter.tsx
 import React, { useState, useEffect, useMemo, useRef } from 'react'
-import { Category, Dataset } from '../types'
+import { Category, Dataset, Annotation } from '../types'
 
 interface AnnotationItem {
   text: string
@@ -13,26 +13,26 @@ interface AnnotationItem {
 
 interface DatasetFilterProps {
   categories: Category[]
-  keywordList: string[]
-  inclusionList: string[]
-  exclusionList: string[]
+  keywordList: Annotation[]
+  inclusionList: Annotation[]
+  exclusionList: Annotation[]
   selectedCategory: Category | null
   onSelectDataset: (ds: Dataset) => void
-  onRemoveKeyword: (term: string) => void
-  onRemoveInclusion: (term: string) => void
-  onRemoveExclusion: (term: string) => void
+  onRemoveKeyword: (ann: Annotation) => void
+  onRemoveInclusion: (ann: Annotation) => void
+  onRemoveExclusion: (ann: Annotation) => void
   onClearKeywords: () => void
   onClearInclusion: () => void
   onClearExclusion: () => void
   isAnnotating: boolean
   onSubmitAnnotations: () => void
   onCancelAnnotation: () => void
-  onAddKeyword: (term: string) => void
-  onAddInclusion: (term: string) => void
-  onAddExclusion: (term: string) => void
+  onAddKeyword: (ann: Annotation) => void
+  onAddInclusion: (ann: Annotation) => void
+  onAddExclusion: (ann: Annotation) => void
 }
 
-// escape regex special characters
+// escape regex special characters for highlighting
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 export default function DatasetFilter({
@@ -63,7 +63,7 @@ export default function DatasetFilter({
     'bg-purple-200',
   ]
 
-  // map subcategory -> term list
+  // Build a map of subcategory → its term labels
   const subTermsMap: Record<string, string[]> = {}
   categories.forEach(cat =>
     cat.children?.forEach(sub => {
@@ -72,7 +72,7 @@ export default function DatasetFilter({
   )
   const subcategories = Object.keys(subTermsMap)
 
-  // flatten datasets
+  // Flatten all datasets from the category tree
   const allDatasets: Dataset[] = []
   const collect = (cats: Category[]) => {
     cats.forEach(c => {
@@ -82,21 +82,27 @@ export default function DatasetFilter({
   }
   collect(categories)
 
-  // apply filters
+  // Apply current filters (now using Annotation.id matching)
   const hasFilters =
     keywordList.length > 0 ||
     inclusionList.length > 0 ||
     exclusionList.length > 0
-  const filtered = hasFilters
-    ? allDatasets.filter(
-        ds =>
-          keywordList.every(k => ds.keywords?.includes(k)) &&
-          inclusionList.every(i => ds.inclusionTerms?.includes(i)) &&
-          exclusionList.every(e => ds.exclusionTerms?.includes(e))
+
+  const filteredDatasets = hasFilters
+    ? allDatasets.filter(ds =>
+        keywordList.every(k =>
+          ds.keywords?.some(ann => ann.id === k.id)
+        ) &&
+        inclusionList.every(i =>
+          ds.inclusionTerms?.some(ann => ann.id === i.id)
+        ) &&
+        exclusionList.every(e =>
+          ds.exclusionTerms?.some(ann => ann.id === e.id)
+        )
       )
     : allDatasets
 
-  // annotation state
+  // Annotation‐extraction UI state
   const [note, setNote] = useState('')
   const [extract, setExtract] = useState<AnnotationItem[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -108,7 +114,7 @@ export default function DatasetFilter({
     }
   }, [isAnnotating])
 
-  // build highlighted HTML
+  // Highlighted HTML for extracted tokens
   const highlightedHTML = useMemo(() => {
     let html = note
       .replace(/&/g, '&amp;')
@@ -126,7 +132,7 @@ export default function DatasetFilter({
     return html
   }, [note, extract])
 
-  // handlers
+  // Fetch extraction from Python script
   const handleExtract = async () => {
     try {
       const res = await fetch('/api/extract-annotations', {
@@ -140,17 +146,19 @@ export default function DatasetFilter({
       console.error('Extraction error', err)
     }
   }
-  const toggleKeyword = (i: number) => {
+
+  // Toggling flags and changing subcategory/term per token
+  const toggleKeywordFlag = (i: number) => {
     const a = [...extract]
     a[i].keyword = !a[i].keyword
     setExtract(a)
   }
-  const toggleInclusion = (i: number) => {
+  const toggleInclusionFlag = (i: number) => {
     const a = [...extract]
     a[i].inclusion = !a[i].inclusion
     setExtract(a)
   }
-  const toggleExclusion = (i: number) => {
+  const toggleExclusionFlag = (i: number) => {
     const a = [...extract]
     a[i].exclusion = !a[i].exclusion
     setExtract(a)
@@ -182,14 +190,14 @@ export default function DatasetFilter({
               Clear
             </button>
           </div>
-          {keywordList.length ? (
-            keywordList.map(t => (
+          {keywordList.length > 0 ? (
+            keywordList.map(ann => (
               <span
-                key={t}
-                onClick={() => onRemoveKeyword(t)}
+                key={ann.id}
+                onClick={() => onRemoveKeyword(ann)}
                 className="block mb-2 px-2 py-0.5 bg-indigo-100 rounded cursor-pointer"
               >
-                {t}
+                {ann.label}
               </span>
             ))
           ) : (
@@ -207,14 +215,14 @@ export default function DatasetFilter({
               Clear
             </button>
           </div>
-          {inclusionList.length ? (
-            inclusionList.map(t => (
+          {inclusionList.length > 0 ? (
+            inclusionList.map(ann => (
               <span
-                key={t}
-                onClick={() => onRemoveInclusion(t)}
+                key={ann.id}
+                onClick={() => onRemoveInclusion(ann)}
                 className="block mb-2 px-2 py-0.5 bg-green-100 rounded cursor-pointer"
               >
-                {t}
+                {ann.label}
               </span>
             ))
           ) : (
@@ -232,14 +240,14 @@ export default function DatasetFilter({
               Clear
             </button>
           </div>
-          {exclusionList.length ? (
-            exclusionList.map(t => (
+          {exclusionList.length > 0 ? (
+            exclusionList.map(ann => (
               <span
-                key={t}
-                onClick={() => onRemoveExclusion(t)}
+                key={ann.id}
+                onClick={() => onRemoveExclusion(ann)}
                 className="block mb-2 px-2 py-0.5 bg-red-100 rounded cursor-pointer"
               >
-                {t}
+                {ann.label}
               </span>
             ))
           ) : (
@@ -265,7 +273,6 @@ export default function DatasetFilter({
               Cancel
             </button>
           </div>
-
           {/* Abstract & Highlight */}
           <div className="relative mb-4">
             {extract.length > 0 && (
@@ -287,7 +294,6 @@ export default function DatasetFilter({
               placeholder="Enter full paper abstract…"
             />
           </div>
-
           {/* Extract Annotations */}
           <div className="flex justify-center mb-4">
             <button
@@ -297,8 +303,7 @@ export default function DatasetFilter({
               Extract annotations
             </button>
           </div>
-
-          {/* Annotation table */}
+          {/* Annotation Table */}
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr>
@@ -354,21 +359,21 @@ export default function DatasetFilter({
                       <input
                         type="checkbox"
                         checked={item.keyword}
-                        onChange={() => toggleKeyword(idx)}
+                        onChange={() => toggleKeywordFlag(idx)}
                       />
                     </td>
                     <td className="border px-2 py-1 text-center">
                       <input
                         type="checkbox"
                         checked={item.inclusion}
-                        onChange={() => toggleInclusion(idx)}
+                        onChange={() => toggleInclusionFlag(idx)}
                       />
                     </td>
                     <td className="border px-2 py-1 text-center">
                       <input
                         type="checkbox"
                         checked={item.exclusion}
-                        onChange={() => toggleExclusion(idx)}
+                        onChange={() => toggleExclusionFlag(idx)}
                       />
                     </td>
                   </tr>
@@ -379,7 +384,7 @@ export default function DatasetFilter({
         </>
       ) : (
         <ul>
-          {filtered.map(ds => (
+          {filteredDatasets.map(ds => (
             <li
               key={ds.id}
               onClick={() => onSelectDataset(ds)}

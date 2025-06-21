@@ -1,13 +1,11 @@
-// pages/index.tsx
 import { useState } from 'react'
 import TreeBrowser from '../components/TreeBrowser'
 import DatasetFilter from '../components/DatasetFilter'
 import DatasetView from '../components/DatasetView'
 import categoryTree from '../data/categories.json'
 import datasets from '../data/datasets.json'
-import { Category, Dataset } from '../types'
+import { Category, Dataset, Annotation } from '../types'
 
-// structure of our JSON tree before merging
 interface CategoryNode {
   id: string
   label: string
@@ -15,14 +13,12 @@ interface CategoryNode {
   children?: CategoryNode[]
 }
 
-// build full Category[] from IDs + datasets.json
 function buildCategories(nodes: CategoryNode[]): Category[] {
   return nodes.map(n => ({
     id: n.id,
     label: n.label,
     datasets: n.datasetIds.map(id => {
-      const ds = datasets.find(d => d.id === id)
-      if (!ds) throw new Error(`Dataset ${id} not found`)
+      const ds = datasets.find(d => d.id === id)!
       return ds
     }),
     children: n.children ? buildCategories(n.children) : undefined,
@@ -36,9 +32,10 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null)
 
-  const [keywordList, setKeywordList] = useState<string[]>([])
-  const [inclusionList, setInclusionList] = useState<string[]>([])
-  const [exclusionList, setExclusionList] = useState<string[]>([])
+  // now hold Annotation objects
+  const [keywordList, setKeywordList] = useState<Annotation[]>([])
+  const [inclusionList, setInclusionList] = useState<Annotation[]>([])
+  const [exclusionList, setExclusionList] = useState<Annotation[]>([])
   const [isAnnotating, setIsAnnotating] = useState(false)
 
   const updateDataset = (id: string, fn: (ds: Dataset) => Dataset) => {
@@ -59,18 +56,27 @@ export default function Home() {
   }
   const handleSelectDataset = (ds: Dataset) => setSelectedDataset(ds)
 
-  const handleAddKeyword = (t: string) =>
-    setKeywordList(list => list.includes(t) ? list : [...list, t])
-  const handleAddInclusion = (t: string) =>
-    setInclusionList(list => list.includes(t) ? list : [...list, t])
-  const handleAddExclusion = (t: string) =>
-    setExclusionList(list => list.includes(t) ? list : [...list, t])
-  const handleRemoveKeyword = (t: string) =>
-    setKeywordList(list => list.filter(x => x !== t))
-  const handleRemoveInclusion = (t: string) =>
-    setInclusionList(list => list.filter(x => x !== t))
-  const handleRemoveExclusion = (t: string) =>
-    setExclusionList(list => list.filter(x => x !== t))
+  // these now expect an Annotation object
+  const handleAddKeyword = (ann: Annotation) =>
+    setKeywordList(list =>
+      list.some(a => a.id === ann.id) ? list : [...list, ann]
+    )
+  const handleAddInclusion = (ann: Annotation) =>
+    setInclusionList(list =>
+      list.some(a => a.id === ann.id) ? list : [...list, ann]
+    )
+  const handleAddExclusion = (ann: Annotation) =>
+    setExclusionList(list =>
+      list.some(a => a.id === ann.id) ? list : [...list, ann]
+    )
+
+  const handleRemoveKeyword = (ann: Annotation) =>
+    setKeywordList(list => list.filter(x => x.id !== ann.id))
+  const handleRemoveInclusion = (ann: Annotation) =>
+    setInclusionList(list => list.filter(x => x.id !== ann.id))
+  const handleRemoveExclusion = (ann: Annotation) =>
+    setExclusionList(list => list.filter(x => x.id !== ann.id))
+
   const handleClearKeywords = () => setKeywordList([])
   const handleClearInclusion = () => setInclusionList([])
   const handleClearExclusion = () => setExclusionList([])
@@ -94,13 +100,13 @@ export default function Home() {
         keywords: keywordList,
         inclusionTerms: inclusionList,
         exclusionTerms: exclusionList,
-      })
+      }),
     })
     updateDataset(selectedDataset.id, ds => ({
       ...ds,
       keywords: keywordList,
       inclusionTerms: inclusionList,
-      exclusionTerms: exclusionList
+      exclusionTerms: exclusionList,
     }))
     setIsAnnotating(false)
   }
