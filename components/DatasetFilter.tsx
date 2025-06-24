@@ -25,7 +25,6 @@ interface DatasetFilterProps {
   onClearInclusion: () => void
   onClearExclusion: () => void
   isAnnotating: boolean
-  /** Now also takes Add annotations callback */
   onAddAnnotations: (items: AnnotationItem[]) => void
   onSubmitAnnotations: (items: AnnotationItem[]) => void
   onCancelAnnotation: () => void
@@ -53,10 +52,14 @@ export default function DatasetFilter({
   onCancelAnnotation,
 }: DatasetFilterProps) {
   const colors = [
-    'bg-yellow-200', 'bg-green-200', 'bg-blue-200', 'bg-pink-200', 'bg-purple-200',
+    'bg-yellow-200',
+    'bg-green-200',
+    'bg-blue-200',
+    'bg-pink-200',
+    'bg-purple-200',
   ]
 
-  // Build subcategory‐label → term‐labels map
+  // Build map of subcategory‐label → term‐labels
   const subTermsMap: Record<string, string[]> = {}
   categories.forEach(cat =>
     cat.children.forEach(sub => {
@@ -65,10 +68,10 @@ export default function DatasetFilter({
   )
   const subcategories = Object.keys(subTermsMap)
 
-  // Flatten all datasets
+  // Flatten datasets
   const allDatasets = datasets
 
-  // Top‐pane filters
+  // Top filters logic
   const hasFilters =
     keywordList.length > 0 ||
     inclusionList.length > 0 ||
@@ -81,7 +84,7 @@ export default function DatasetFilter({
       )
     : allDatasets
 
-  // Annotation‐extraction state
+  // Annotation-extraction state
   const [note, setNote] = useState('')
   const [extract, setExtract] = useState<AnnotationItem[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -110,6 +113,7 @@ export default function DatasetFilter({
     return html
   }, [note, extract])
 
+  // Fetch extracted annotations
   const handleExtract = async () => {
     const res = await fetch('/api/extract-annotations', {
       method: 'POST',
@@ -118,6 +122,11 @@ export default function DatasetFilter({
     })
     const data = await res.json()
     setExtract(data.result)
+  }
+
+  // Remove an extracted row
+  const handleRemoveExtract = (i: number) => {
+    setExtract(prev => prev.filter((_, idx) => idx !== i))
   }
 
   const toggleFlag = (
@@ -171,7 +180,6 @@ export default function DatasetFilter({
             <div className="text-gray-500">None</div>
           )}
         </div>
-
         {/* Inclusion Terms */}
         <div>
           <div className="flex justify-between mb-2">
@@ -197,7 +205,6 @@ export default function DatasetFilter({
             <div className="text-gray-500">None</div>
           )}
         </div>
-
         {/* Exclusion Terms */}
         <div>
           <div className="flex justify-between mb-2">
@@ -247,7 +254,9 @@ export default function DatasetFilter({
           <div className="relative mb-4">
             {extract.length > 0 && (
               <pre className="absolute inset-0 p-2 whitespace-pre-wrap pointer-events-none">
-                <span dangerouslySetInnerHTML={{ __html: highlightedHTML }} />
+                <span
+                  dangerouslySetInnerHTML={{ __html: highlightedHTML }}
+                />
               </pre>
             )}
             <textarea
@@ -263,7 +272,7 @@ export default function DatasetFilter({
             />
           </div>
 
-          {/* Extract & Add Annotations buttons */}
+          {/* Extract & Add Annotations */}
           <div className="flex justify-center mb-4 space-x-4">
             <button
               onClick={handleExtract}
@@ -283,9 +292,13 @@ export default function DatasetFilter({
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr>
+                <th className="border px-2 py-1 bg-gray-100"></th>
                 {['Text', 'Subcategory', 'Term', 'Keyword', 'Inclusion', 'Exclusion'].map(
                   col => (
-                    <th key={col} className="border px-2 py-1 bg-gray-100 text-left">
+                    <th
+                      key={col}
+                      className="border px-2 py-1 bg-gray-100 text-left"
+                    >
                       {col}
                     </th>
                   )
@@ -297,11 +310,21 @@ export default function DatasetFilter({
                 const hl = colors[idx % colors.length]
                 return (
                   <tr key={idx} className="hover:bg-gray-50">
+                    <td className="border px-2 py-1 text-center">
+                      <button
+                        onClick={() => handleRemoveExtract(idx)}
+                        className="text-red-500"
+                      >
+                        X
+                      </button>
+                    </td>
                     <td className={`border px-2 py-1 ${hl}`}>{item.text}</td>
                     <td className="border px-2 py-1">
                       <select
                         value={item.subcategory}
-                        onChange={e => handleSubcategoryChange(idx, e.target.value)}
+                        onChange={e =>
+                          handleSubcategoryChange(idx, e.target.value)
+                        }
                         className="border rounded px-1 py-0.5"
                       >
                         <option value="">None</option>
