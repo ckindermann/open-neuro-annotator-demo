@@ -9,6 +9,7 @@ import { Category, Dataset, Annotation } from '../types'
 // Shape of each row in the annotation table
 interface AnnotationItem {
   text: string
+  category: string
   subcategory: string
   term: string
   keyword: boolean
@@ -50,10 +51,10 @@ export default function Home() {
   }
   const handleCancelAnnotation = () => setIsAnnotating(false)
 
-  // 1) “Add annotations” merges the table items into the in‐memory lists, stays in annotation mode
+  // 1) “Add annotations” merges the current table items into the in‐memory lists, stays in annotation mode
   const handleAddAnnotations = (items: AnnotationItem[]) => {
-    // map labels → ids
-    const labelToId = new Map<string, string>()
+    // Build a map label → id for categories, subcats, and terms
+    const labelToId = new Map<string,string>()
     const walk = (cats: Category[]) => {
       cats.forEach(c => {
         labelToId.set(c.label, c.id)
@@ -68,13 +69,13 @@ export default function Home() {
     }
     walk(categories)
 
-    // derive new sets
     const newKs: Annotation[] = []
     const newIs: Annotation[] = []
     const newEs: Annotation[] = []
 
     items.forEach(item => {
-      const chosenLabel = item.term || item.subcategory
+      // prefer term, then subcategory, then category
+      const chosenLabel = item.term || item.subcategory || item.category
       const chosenId = labelToId.get(chosenLabel) ?? chosenLabel
       const ann: Annotation = {
         id: chosenId,
@@ -87,7 +88,6 @@ export default function Home() {
       if (item.exclusion) newEs.push(ann)
     })
 
-    // merge avoiding duplicates
     setKeywordList(kl => [
       ...kl,
       ...newKs.filter(a => !kl.some(k => k.id === a.id))
@@ -100,15 +100,14 @@ export default function Home() {
       ...el,
       ...newEs.filter(a => !el.some(e => e.id === a.id))
     ])
-    // stay in annotation mode
+    // remain in annotation mode
   }
 
-  // 2) “Submit Annotations” writes out and exits annotation mode
+  // 2) “Submit Annotations” writes out and exits annotation mode (unchanged)
   const handleSubmitAnnotations = async (items: AnnotationItem[]) => {
     if (!selectedDataset) return
 
-    // map labels → ids
-    const labelToId = new Map<string, string>()
+    const labelToId = new Map<string,string>()
     const walk = (cats: Category[]) => {
       cats.forEach(c => {
         labelToId.set(c.label, c.id)
@@ -123,13 +122,12 @@ export default function Home() {
     }
     walk(categories)
 
-    // derive merged lists just like Add, but then persist
     const mergedKs: Annotation[] = []
     const mergedIs: Annotation[] = []
     const mergedEs: Annotation[] = []
 
     items.forEach(item => {
-      const chosenLabel = item.term || item.subcategory
+      const chosenLabel = item.term || item.subcategory || item.category
       const chosenId = labelToId.get(chosenLabel) ?? chosenLabel
       const ann: Annotation = {
         id: chosenId,
@@ -142,7 +140,6 @@ export default function Home() {
       if (item.exclusion) mergedEs.push(ann)
     })
 
-    // also include any existing in-memory ones
     const finalKs = [
       ...keywordList,
       ...mergedKs.filter(a => !keywordList.some(k => k.id === a.id))
@@ -156,7 +153,6 @@ export default function Home() {
       ...mergedEs.filter(a => !exclusionList.some(e => e.id === a.id))
     ]
 
-    // Persist
     await fetch('/api/save-annotations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -168,7 +164,6 @@ export default function Home() {
       }),
     })
 
-    // Update state & exit annotation mode
     updateDataset(selectedDataset.id, ds => ({
       ...ds,
       keywords: finalKs,
