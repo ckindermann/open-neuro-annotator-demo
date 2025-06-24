@@ -64,11 +64,11 @@ export default function DatasetFilter({
     'bg-purple-200',
   ]
 
-  // Build a map of subcategory → its term labels
+  // Build a map of subcategory‐label → its term labels
   const subTermsMap: Record<string, string[]> = {}
   categories.forEach(cat =>
     cat.children.forEach(sub => {
-      subTermsMap[sub.id] = sub.children.map(t => t.label)
+      subTermsMap[sub.label] = sub.children.map(t => t.label)
     })
   )
   const subcategories = Object.keys(subTermsMap)
@@ -141,7 +141,7 @@ export default function DatasetFilter({
     }
   }
 
-  // Toggling flags and changing subcategory/term per token
+  // Toggle flags and update subcategory/term per token
   const toggleKeywordFlag = (i: number) => {
     const a = [...extract]
     a[i].keyword = !a[i].keyword
@@ -171,7 +171,7 @@ export default function DatasetFilter({
 
   return (
     <div className="p-4 border-r">
-      {/* Top filters */}
+      {/* Top filters (same as before) */}
       <div className="grid grid-cols-3 gap-4 mb-4">
         {/* Keywords */}
         <div>
@@ -267,7 +267,8 @@ export default function DatasetFilter({
               Cancel
             </button>
           </div>
-          {/* Abstract & Highlight */}
+
+          {/* Abstract & Highlight (same) */}
           <div className="relative mb-4">
             {extract.length > 0 && (
               <pre className="absolute inset-0 p-2 whitespace-pre-wrap pointer-events-none">
@@ -288,7 +289,8 @@ export default function DatasetFilter({
               placeholder="Enter full paper abstract…"
             />
           </div>
-          {/* Extract Annotations */}
+
+          {/* Extract button */}
           <div className="flex justify-center mb-4">
             <button
               onClick={handleExtract}
@@ -297,6 +299,7 @@ export default function DatasetFilter({
               Extract annotations
             </button>
           </div>
+
           {/* Annotation Table */}
           <table className="w-full table-auto border-collapse">
             <thead>
@@ -328,9 +331,9 @@ export default function DatasetFilter({
                         className="border rounded px-1 py-0.5"
                       >
                         <option value="">None</option>
-                        {subcategories.map(s => (
-                          <option key={s} value={s}>
-                            {s}
+                        {subcategories.map(label => (
+                          <option key={label} value={label}>
+                            {label}
                           </option>
                         ))}
                       </select>
