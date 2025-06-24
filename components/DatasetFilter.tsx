@@ -68,7 +68,7 @@ export default function DatasetFilter({
   )
   const subcategories = Object.keys(subTermsMap)
 
-  // Flatten datasets for filtering
+  // Top filters logic
   const hasFilters =
     keywordList.length > 0 ||
     inclusionList.length > 0 ||
@@ -297,16 +297,23 @@ export default function DatasetFilter({
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr>
-                {['Text', 'Subcategory', 'Term', 'Keyword', 'Inclusion', 'Exclusion', '+', ''].map(
-                  col => (
-                    <th
-                      key={col}
-                      className="border px-2 py-1 bg-gray-100 text-left"
-                    >
-                      {col}
-                    </th>
-                  )
-                )}
+                {[
+                  'Text',
+                  'Subcategory',
+                  'Term',
+                  'Keyword',
+                  'Inclusion',
+                  'Exclusion',
+                  '+',
+                  '',
+                ].map(col => (
+                  <th
+                    key={col}
+                    className="border px-2 py-1 bg-gray-100 text-left"
+                  >
+                    {col}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -318,7 +325,9 @@ export default function DatasetFilter({
                     <td className="border px-2 py-1">
                       <select
                         value={item.subcategory}
-                        onChange={e => handleSubcategoryChange(idx, e.target.value)}
+                        onChange={e =>
+                          handleSubcategoryChange(idx, e.target.value)
+                        }
                         className="border rounded px-1 py-0.5"
                       >
                         <option value="">None</option>
@@ -377,7 +386,7 @@ export default function DatasetFilter({
                         onClick={() => handleRemoveExtract(idx)}
                         className="text-red-500"
                       >
-                        X
+                        -
                       </button>
                     </td>
                   </tr>
