@@ -1,140 +1,168 @@
 [
   {
-    "id": "ds-mri-t1-1",
-    "label": "High-Res T1",
-    "description": "High resolution T1-weighted anatomical scan.",
+    "id": "ds-001",
+    "label": "Sulcal Anatomy Study",
+    "description": "High-resolution structural scans focusing on key sulci in the human cortex.",
     "keywords": [
-      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
-      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" },
-      { "id": "t1-weighted", "label": "T1-weighted", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000360",
+        "label": "Drug Use",
+        "comment": "",
+        "text": "Another"
+      },
+      {
+        "id": "ONVOC:0000354",
+        "label": "Adult",
+        "comment": "",
+        "text": "test"
+      },
+      {
+        "id": "ONVOC:0000216",
+        "label": "Trazodone",
+        "comment": "",
+        "text": "a"
+      }
     ],
     "inclusionTerms": [
-      { "id": "t1-weighted", "label": "T1-weighted", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000169",
+        "label": "Atomoxetine",
+        "comment": "",
+        "text": "a"
+      },
+      {
+        "id": "ONVOC:0000379",
+        "label": "Normal Cognitive Development",
+        "comment": "",
+        "text": "ds"
+      }
     ],
     "exclusionTerms": [
-      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000553",
+        "label": "European",
+        "comment": "",
+        "text": "Example"
+      },
+      {
+        "id": "ONVOC:0000283",
+        "label": "Zonisamide",
+        "comment": "",
+        "text": "annotation"
+      },
+      {
+        "id": "ONVOC:0000169",
+        "label": "Atomoxetine",
+        "comment": "",
+        "text": "a"
+      },
+      {
+        "id": "ONVOC:0000379",
+        "label": "Normal Cognitive Development",
+        "comment": "",
+        "text": "ds"
+      }
     ],
-    "authors": ["Smith, John", "Doe, Alice"],
-    "accessionNumber": "ACC-00001",
-    "doi": "10.1000/xyz123",
+    "authors": [
+      "Smith, Alice",
+      "Chen, Bob"
+    ],
+    "accessionNumber": "ACC-EX-001",
+    "doi": "10.1000/example001",
     "license": "CC-BY-4.0"
   },
   {
-    "id": "ds-mri-t1-2",
-    "label": "Standard T1",
-    "description": "Standard clinical T1 scan.",
+    "id": "ds-002",
+    "label": "Amygdala Functional Connectivity",
+    "description": "fMRI dataset targeting amygdala connections within subcortical networks.",
     "keywords": [
-      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
-      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" },
-      { "id": "t1-weighted", "label": "T1-weighted", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000082",
+        "label": "Amygdala",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000517",
+        "label": "Salience network",
+        "comment": "",
+        "text": ""
+      }
     ],
     "inclusionTerms": [
-      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000008",
+        "label": "Subcortical Regions",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000515",
+        "label": "Brain Networks",
+        "comment": "",
+        "text": ""
+      }
     ],
     "exclusionTerms": [
-      { "id": "resting-fmri", "label": "Resting-state fMRI", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000001",
+        "label": "Brain Regions",
+        "comment": "",
+        "text": ""
+      }
     ],
-    "authors": ["Lee, Katie", "Zhang, Wei"],
-    "accessionNumber": "ACC-00002",
-    "doi": "10.1000/xyz124",
-    "license": "CC0"
-  },
-  {
-    "id": "ds-mri-t2-1",
-    "label": "Fluid-sensitive T2",
-    "description": "T2-weighted scan emphasizing fluid contrast.",
-    "keywords": [
-      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
-      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" },
-      { "id": "t2-weighted", "label": "T2-weighted", "comment": "", "text": "" }
+    "authors": [
+      "Garcia, Maria"
     ],
-    "inclusionTerms": [
-      { "id": "t2-weighted", "label": "T2-weighted", "comment": "", "text": "" }
-    ],
-    "exclusionTerms": [
-      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
-    ],
-    "authors": ["Nguyen, Minh"],
-    "accessionNumber": "ACC-00003",
-    "doi": "10.1000/xyz125",
-    "license": "CC-BY-4.0"
-  },
-  {
-    "id": "ds-fmri-rest-1",
-    "label": "Rest fMRI Session",
-    "description": "Resting state BOLD fMRI run.",
-    "keywords": [
-      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
-      { "id": "functional-mri", "label": "Functional MRI", "comment": "", "text": "" },
-      { "id": "resting-fmri", "label": "Resting-state fMRI", "comment": "", "text": "" }
-    ],
-    "inclusionTerms": [
-      { "id": "resting-fmri", "label": "Resting-state fMRI", "comment": "", "text": "" }
-    ],
-    "exclusionTerms": [
-      { "id": "t1-weighted", "label": "T1-weighted", "comment": "", "text": "" }
-    ],
-    "authors": ["Garcia, Maria"],
-    "accessionNumber": "ACC-00004",
-    "doi": "10.1000/xyz126",
+    "accessionNumber": "ACC-EX-002",
+    "doi": "10.1000/example002",
     "license": "CC-BY-NC"
   },
   {
-    "id": "ds-fmri-task-1",
-    "label": "Visual Task fMRI",
-    "description": "fMRI during visual stimulation task.",
+    "id": "ds-003",
+    "label": "Parkinson’s Medication Effects",
+    "description": "PET scans evaluating dopaminergic drug distribution in Parkinson’s patients.",
     "keywords": [
-      { "id": "mri", "label": "MRI", "comment": "", "text": "" },
-      { "id": "functional-mri", "label": "Functional MRI", "comment": "", "text": "" },
-      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000166",
+        "label": "Parkinsons Disease Medication",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000296",
+        "label": "Levodopa",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000452",
+        "label": "Loss of Interest",
+        "comment": "",
+        "text": "a"
+      }
     ],
     "inclusionTerms": [
-      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000166",
+        "label": "Parkinsons Disease Medication",
+        "comment": "",
+        "text": ""
+      }
     ],
     "exclusionTerms": [
-      { "id": "structural-mri", "label": "Structural MRI", "comment": "", "text": "" }
+      {
+        "id": "ONVOC:0000157",
+        "label": "Anti Psychotics",
+        "comment": "",
+        "text": ""
+      }
     ],
-    "authors": ["Kumar, Raj", "Patel, Sunita"],
-    "accessionNumber": "ACC-00005",
-    "doi": "10.1000/xyz127",
-    "license": "CC-BY-4.0"
-  },
-  {
-    "id": "ds-pet-amy-1",
-    "label": "Amyloid Tracer Scan",
-    "description": "PET scan using amyloid tracer.",
-    "keywords": [
-      { "id": "pet", "label": "PET", "comment": "", "text": "" },
-      { "id": "amyloid-pet", "label": "Amyloid PET", "comment": "", "text": "" }
+    "authors": [
+      "Nguyen, Minh"
     ],
-    "inclusionTerms": [
-      { "id": "amyloid-pet", "label": "Amyloid PET", "comment": "", "text": "" }
-    ],
-    "exclusionTerms": [
-      { "id": "task-fmri", "label": "Task-based fMRI", "comment": "", "text": "" }
-    ],
-    "authors": ["Sato, Yuki"],
-    "accessionNumber": "ACC-00006",
-    "doi": "10.1000/xyz128",
-    "license": "CC-BY-NC"
-  },
-  {
-    "id": "ds-pet-fdg-1",
-    "label": "FDG Metabolism Scan",
-    "description": "FDG-PET metabolic imaging.",
-    "keywords": [
-      { "id": "pet", "label": "PET", "comment": "", "text": "" },
-      { "id": "fdg-pet", "label": "FDG-PET", "comment": "", "text": "" }
-    ],
-    "inclusionTerms": [
-      { "id": "fdg-pet", "label": "FDG-PET", "comment": "", "text": "" }
-    ],
-    "exclusionTerms": [
-      { "id": "amyloid-pet", "label": "Amyloid PET", "comment": "", "text": "" }
-    ],
-    "authors": ["O'Neil, Liam"],
-    "accessionNumber": "ACC-00007",
-    "doi": "10.1000/xyz129",
+    "accessionNumber": "ACC-EX-003",
+    "doi": "10.1000/example003",
     "license": "CC0"
   }
 ]
