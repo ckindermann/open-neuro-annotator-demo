@@ -1,4 +1,3 @@
-// components/DatasetFilter.tsx
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Category, Dataset, Annotation } from '../types'
 
@@ -12,6 +11,7 @@ interface AnnotationItem {
 }
 
 interface DatasetFilterProps {
+  datasets: Dataset[]
   categories: Category[]
   keywordList: Annotation[]
   inclusionList: Annotation[]
@@ -36,6 +36,7 @@ interface DatasetFilterProps {
 const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 export default function DatasetFilter({
+  datasets,
   categories,
   keywordList,
   inclusionList,
@@ -66,23 +67,16 @@ export default function DatasetFilter({
   // Build a map of subcategory → its term labels
   const subTermsMap: Record<string, string[]> = {}
   categories.forEach(cat =>
-    cat.children?.forEach(sub => {
-      subTermsMap[sub.label] = sub.children?.map(t => t.label) || []
+    cat.children.forEach(sub => {
+      subTermsMap[sub.id] = sub.children.map(t => t.label)
     })
   )
   const subcategories = Object.keys(subTermsMap)
 
-  // Flatten all datasets from the category tree
-  const allDatasets: Dataset[] = []
-  const collect = (cats: Category[]) => {
-    cats.forEach(c => {
-      allDatasets.push(...c.datasets)
-      if (c.children) collect(c.children)
-    })
-  }
-  collect(categories)
+  // Use datasets prop directly
+  const allDatasets: Dataset[] = datasets
 
-  // Apply current filters (now using Annotation.id matching)
+  // Apply current filters (matching by Annotation.id)
   const hasFilters =
     keywordList.length > 0 ||
     inclusionList.length > 0 ||

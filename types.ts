@@ -18,9 +18,9 @@ export interface Dataset {
   license?: string
 }
 
+// Category only describes hierarchy now
 export interface Category {
   id: string
   label: string
-  datasets: Dataset[]
-  children?: Category[]
+  children: Category[]
 }
