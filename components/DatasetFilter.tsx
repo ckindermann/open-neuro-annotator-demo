@@ -25,6 +25,8 @@ interface DatasetFilterProps {
   onClearInclusion: () => void
   onClearExclusion: () => void
   isAnnotating: boolean
+  /** Now also takes Add annotations callback */
+  onAddAnnotations: (items: AnnotationItem[]) => void
   onSubmitAnnotations: (items: AnnotationItem[]) => void
   onCancelAnnotation: () => void
 }
@@ -46,15 +48,12 @@ export default function DatasetFilter({
   onClearInclusion,
   onClearExclusion,
   isAnnotating,
+  onAddAnnotations,
   onSubmitAnnotations,
   onCancelAnnotation,
 }: DatasetFilterProps) {
   const colors = [
-    'bg-yellow-200',
-    'bg-green-200',
-    'bg-blue-200',
-    'bg-pink-200',
-    'bg-purple-200',
+    'bg-yellow-200', 'bg-green-200', 'bg-blue-200', 'bg-pink-200', 'bg-purple-200',
   ]
 
   // Build subcategory‐label → term‐labels map
@@ -76,15 +75,9 @@ export default function DatasetFilter({
     exclusionList.length > 0
   const filteredDatasets = hasFilters
     ? allDatasets.filter(ds =>
-        keywordList.every(k =>
-          ds.keywords?.some(a => a.id === k.id)
-        ) &&
-        inclusionList.every(i =>
-          ds.inclusionTerms?.some(a => a.id === i.id)
-        ) &&
-        exclusionList.every(e =>
-          ds.exclusionTerms?.some(a => a.id === e.id)
-        )
+        keywordList.every(k => ds.keywords?.some(a => a.id === k.id)) &&
+        inclusionList.every(i => ds.inclusionTerms?.some(a => a.id === i.id)) &&
+        exclusionList.every(e => ds.exclusionTerms?.some(a => a.id === e.id))
       )
     : allDatasets
 
@@ -270,13 +263,19 @@ export default function DatasetFilter({
             />
           </div>
 
-          {/* Extract button */}
-          <div className="flex justify-center mb-4">
+          {/* Extract & Add Annotations buttons */}
+          <div className="flex justify-center mb-4 space-x-4">
             <button
               onClick={handleExtract}
               className="px-4 py-2 bg-gray-200 rounded"
             >
               Extract annotations
+            </button>
+            <button
+              onClick={() => onAddAnnotations(extract)}
+              className="px-4 py-2 bg-green-200 rounded"
+            >
+              Add annotations
             </button>
           </div>
 
@@ -284,11 +283,13 @@ export default function DatasetFilter({
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr>
-                {['Text', 'Subcategory', 'Term', 'Keyword', 'Inclusion', 'Exclusion'].map(col => (
-                  <th key={col} className="border px-2 py-1 bg-gray-100 text-left">
-                    {col}
-                  </th>
-                ))}
+                {['Text', 'Subcategory', 'Term', 'Keyword', 'Inclusion', 'Exclusion'].map(
+                  col => (
+                    <th key={col} className="border px-2 py-1 bg-gray-100 text-left">
+                      {col}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody>

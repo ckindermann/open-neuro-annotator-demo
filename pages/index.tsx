@@ -50,11 +50,9 @@ export default function Home() {
   }
   const handleCancelAnnotation = () => setIsAnnotating(false)
 
-  // Called when the user clicks “Submit Annotations” in the table
-  const handleSubmitAnnotations = async (extractItems: AnnotationItem[]) => {
-    if (!selectedDataset) return
-
-    // Build a map from label to id for all categories and terms
+  // 1) “Add annotations” merges the table items into the in‐memory lists, stays in annotation mode
+  const handleAddAnnotations = (items: AnnotationItem[]) => {
+    // map labels → ids
     const labelToId = new Map<string, string>()
     const walk = (cats: Category[]) => {
       cats.forEach(c => {
@@ -70,12 +68,12 @@ export default function Home() {
     }
     walk(categories)
 
-    // Derive new annotations from the table
-    const newKeywords: Annotation[] = []
-    const newInclusions: Annotation[] = []
-    const newExclusions: Annotation[] = []
+    // derive new sets
+    const newKs: Annotation[] = []
+    const newIs: Annotation[] = []
+    const newEs: Annotation[] = []
 
-    for (const item of extractItems) {
+    items.forEach(item => {
       const chosenLabel = item.term || item.subcategory
       const chosenId = labelToId.get(chosenLabel) ?? chosenLabel
       const ann: Annotation = {
@@ -84,47 +82,102 @@ export default function Home() {
         comment: '',
         text: item.text
       }
-      if (item.keyword)    newKeywords.push(ann)
-      if (item.inclusion)  newInclusions.push(ann)
-      if (item.exclusion)  newExclusions.push(ann)
+      if (item.keyword)   newKs.push(ann)
+      if (item.inclusion) newIs.push(ann)
+      if (item.exclusion) newEs.push(ann)
+    })
+
+    // merge avoiding duplicates
+    setKeywordList(kl => [
+      ...kl,
+      ...newKs.filter(a => !kl.some(k => k.id === a.id))
+    ])
+    setInclusionList(il => [
+      ...il,
+      ...newIs.filter(a => !il.some(i => i.id === a.id))
+    ])
+    setExclusionList(el => [
+      ...el,
+      ...newEs.filter(a => !el.some(e => e.id === a.id))
+    ])
+    // stay in annotation mode
+  }
+
+  // 2) “Submit Annotations” writes out and exits annotation mode
+  const handleSubmitAnnotations = async (items: AnnotationItem[]) => {
+    if (!selectedDataset) return
+
+    // map labels → ids
+    const labelToId = new Map<string, string>()
+    const walk = (cats: Category[]) => {
+      cats.forEach(c => {
+        labelToId.set(c.label, c.id)
+        c.children.forEach(sub => {
+          labelToId.set(sub.label, sub.id)
+          sub.children.forEach(term => {
+            labelToId.set(term.label, term.id)
+          })
+        })
+        walk(c.children)
+      })
     }
+    walk(categories)
 
-    // Merge with existing lists, avoiding duplicates by id
-    const mergedKeywords = [
+    // derive merged lists just like Add, but then persist
+    const mergedKs: Annotation[] = []
+    const mergedIs: Annotation[] = []
+    const mergedEs: Annotation[] = []
+
+    items.forEach(item => {
+      const chosenLabel = item.term || item.subcategory
+      const chosenId = labelToId.get(chosenLabel) ?? chosenLabel
+      const ann: Annotation = {
+        id: chosenId,
+        label: chosenLabel,
+        comment: '',
+        text: item.text
+      }
+      if (item.keyword)   mergedKs.push(ann)
+      if (item.inclusion) mergedIs.push(ann)
+      if (item.exclusion) mergedEs.push(ann)
+    })
+
+    // also include any existing in-memory ones
+    const finalKs = [
       ...keywordList,
-      ...newKeywords.filter(nk => !keywordList.some(k => k.id === nk.id))
+      ...mergedKs.filter(a => !keywordList.some(k => k.id === a.id))
     ]
-    const mergedInclusions = [
+    const finalIs = [
       ...inclusionList,
-      ...newInclusions.filter(ni => !inclusionList.some(i => i.id === ni.id))
+      ...mergedIs.filter(a => !inclusionList.some(i => i.id === a.id))
     ]
-    const mergedExclusions = [
+    const finalEs = [
       ...exclusionList,
-      ...newExclusions.filter(ne => !exclusionList.some(e => e.id === ne.id))
+      ...mergedEs.filter(a => !exclusionList.some(e => e.id === a.id))
     ]
 
-    // Persist merged lists
+    // Persist
     await fetch('/api/save-annotations', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         datasetId: selectedDataset.id,
-        keywords: mergedKeywords,
-        inclusionTerms: mergedInclusions,
-        exclusionTerms: mergedExclusions,
+        keywords: finalKs,
+        inclusionTerms: finalIs,
+        exclusionTerms: finalEs,
       }),
     })
 
-    // Update UI state
+    // Update state & exit annotation mode
     updateDataset(selectedDataset.id, ds => ({
       ...ds,
-      keywords: mergedKeywords,
-      inclusionTerms: mergedInclusions,
-      exclusionTerms: mergedExclusions,
+      keywords: finalKs,
+      inclusionTerms: finalIs,
+      exclusionTerms: finalEs,
     }))
-    setKeywordList(mergedKeywords)
-    setInclusionList(mergedInclusions)
-    setExclusionList(mergedExclusions)
+    setKeywordList(finalKs)
+    setInclusionList(finalIs)
+    setExclusionList(finalEs)
     setIsAnnotating(false)
   }
 
@@ -172,6 +225,7 @@ export default function Home() {
         onClearInclusion={() => setInclusionList([])}
         onClearExclusion={() => setExclusionList([])}
         isAnnotating={isAnnotating}
+        onAddAnnotations={handleAddAnnotations}
         onSubmitAnnotations={handleSubmitAnnotations}
         onCancelAnnotation={handleCancelAnnotation}
       />
