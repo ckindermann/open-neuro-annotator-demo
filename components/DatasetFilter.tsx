@@ -59,7 +59,7 @@ export default function DatasetFilter({
     'bg-purple-200',
   ]
 
-  // Build map of subcategory‐label → term‐labels
+  // Build map of subcategory-label → term labels
   const subTermsMap: Record<string, string[]> = {}
   categories.forEach(cat =>
     cat.children.forEach(sub => {
@@ -68,21 +68,19 @@ export default function DatasetFilter({
   )
   const subcategories = Object.keys(subTermsMap)
 
-  // Flatten datasets
-  const allDatasets = datasets
-
-  // Top filters logic
+  // Flatten datasets for filtering
   const hasFilters =
     keywordList.length > 0 ||
     inclusionList.length > 0 ||
     exclusionList.length > 0
+
   const filteredDatasets = hasFilters
-    ? allDatasets.filter(ds =>
+    ? datasets.filter(ds =>
         keywordList.every(k => ds.keywords?.some(a => a.id === k.id)) &&
         inclusionList.every(i => ds.inclusionTerms?.some(a => a.id === i.id)) &&
         exclusionList.every(e => ds.exclusionTerms?.some(a => a.id === e.id))
       )
-    : allDatasets
+    : datasets
 
   // Annotation-extraction state
   const [note, setNote] = useState('')
@@ -127,6 +125,15 @@ export default function DatasetFilter({
   // Remove an extracted row
   const handleRemoveExtract = (i: number) => {
     setExtract(prev => prev.filter((_, idx) => idx !== i))
+  }
+
+  // Duplicate an extracted row
+  const handleDuplicateExtract = (i: number) => {
+    setExtract(prev => {
+      const copy = [...prev]
+      copy.splice(i + 1, 0, { ...prev[i] })
+      return copy
+    })
   }
 
   const toggleFlag = (
@@ -254,9 +261,7 @@ export default function DatasetFilter({
           <div className="relative mb-4">
             {extract.length > 0 && (
               <pre className="absolute inset-0 p-2 whitespace-pre-wrap pointer-events-none">
-                <span
-                  dangerouslySetInnerHTML={{ __html: highlightedHTML }}
-                />
+                <span dangerouslySetInnerHTML={{ __html: highlightedHTML }} />
               </pre>
             )}
             <textarea
@@ -292,8 +297,7 @@ export default function DatasetFilter({
           <table className="w-full table-auto border-collapse">
             <thead>
               <tr>
-                <th className="border px-2 py-1 bg-gray-100"></th>
-                {['Text', 'Subcategory', 'Term', 'Keyword', 'Inclusion', 'Exclusion'].map(
+                {['Text', 'Subcategory', 'Term', 'Keyword', 'Inclusion', 'Exclusion', '+', ''].map(
                   col => (
                     <th
                       key={col}
@@ -310,21 +314,11 @@ export default function DatasetFilter({
                 const hl = colors[idx % colors.length]
                 return (
                   <tr key={idx} className="hover:bg-gray-50">
-                    <td className="border px-2 py-1 text-center">
-                      <button
-                        onClick={() => handleRemoveExtract(idx)}
-                        className="text-red-500"
-                      >
-                        X
-                      </button>
-                    </td>
                     <td className={`border px-2 py-1 ${hl}`}>{item.text}</td>
                     <td className="border px-2 py-1">
                       <select
                         value={item.subcategory}
-                        onChange={e =>
-                          handleSubcategoryChange(idx, e.target.value)
-                        }
+                        onChange={e => handleSubcategoryChange(idx, e.target.value)}
                         className="border rounded px-1 py-0.5"
                       >
                         <option value="">None</option>
@@ -369,6 +363,22 @@ export default function DatasetFilter({
                         checked={item.exclusion}
                         onChange={() => toggleFlag(idx, 'exclusion')}
                       />
+                    </td>
+                    <td className="border px-2 py-1 text-center">
+                      <button
+                        onClick={() => handleDuplicateExtract(idx)}
+                        className="text-green-500"
+                      >
+                        +
+                      </button>
+                    </td>
+                    <td className="border px-2 py-1 text-center">
+                      <button
+                        onClick={() => handleRemoveExtract(idx)}
+                        className="text-red-500"
+                      >
+                        X
+                      </button>
                     </td>
                   </tr>
                 )
