@@ -1,106 +1,76 @@
 #!/usr/bin/env python3
 import json
-import random
 import sys
-import re
-from typing import List, Dict, Any
+from pathlib import Path
+from gliner import GLiNER
 
-# Paths to your data JSON files
-CATEGORY_PATH = 'data/categories.json'
-DATASET_PATH = 'data/datasets.json'
+# Determine project root and data paths
+BASE_DIR = Path(__file__).resolve().parent.parent
+CATEGORIES_PATH = BASE_DIR / "data" / "categories.json"
 
-def load_tree(category_path: str, dataset_path: str) -> List[Dict[str, Any]]:
+def load_hierarchy(categories_path: Path):
     """
-    Load the category tree from JSON and attach the actual dataset objects
-    based on datasetIds.
+    Load categories.json and return:
+      - labels: a flat list of all category & subcategory labels
+      - label_map: mapping each label -> (category_label, subcategory_label)
     """
-    with open(category_path, 'r') as f:
-        categories = json.load(f)
-    with open(dataset_path, 'r') as f:
-        datasets = json.load(f)
+    with categories_path.open(encoding="utf-8") as f:
+        cats = json.load(f)
 
-    def attach(node: Dict[str, Any]) -> Dict[str, Any]:
-        # find any datasets whose id is listed on this node
-        attached = {
-            'id': node['id'],
-            'label': node.get('label', node['id']),
-            'datasets': [
-                d for d in datasets
-                if d.get('id') in node.get('datasetIds', [])
-            ]
-        }
-        # recurse into children
-        if 'children' in node and node['children']:
-            attached['children'] = [attach(child) for child in node['children']]
-        return attached
+    labels: list[str] = []
+    label_map: dict[str, tuple[str, str]] = {}
 
-    return [attach(n) for n in categories]
+    for cat in cats:
+        cat_lbl = cat["label"]
+        labels.append(cat_lbl)
+        label_map[cat_lbl] = (cat_lbl, "")      # top‐level category
 
-def build_levels(tree: List[Dict[str, Any]]) -> (List[str], Dict[str, List[str]]):
-    """
-    Extract second-level labels (subcategories) and map each to its
-    third-level children (term labels).
-    Returns:
-      - level2_labels: list of all subcategory labels
-      - sub_to_terms: dict mapping subcategory label -> list of term labels
-    """
-    level2_labels: List[str] = []
-    sub_to_terms: Dict[str, List[str]] = {}
+        for sub in cat.get("children", []):
+            sub_lbl = sub["label"]
+            labels.append(sub_lbl)
+            label_map[sub_lbl] = (cat_lbl, sub_lbl)
 
-    for cat in tree:
-        for sub in cat.get('children', []):
-            sub_label = sub['label']
-            level2_labels.append(sub_label)
-            # take the labels of any deeper children as "terms"
-            child_terms = [term['label'] for term in sub.get('children', [])]
-            sub_to_terms[sub_label] = child_terms
-
-    return level2_labels, sub_to_terms
+    return labels, label_map
 
 def extract_annotations(
     text: str,
-    subs: List[str],
-    sub_to_terms: Dict[str, List[str]]
-) -> List[Dict[str, Any]]:
+    model_name: str = "urchade/gliner_large_bio-v0.1",
+    threshold: float = 0.5
+) -> list[dict]:
     """
-    Split the input text into tokens and for each:
-      - pick a random subcategory from subs
-      - pick a random term under that subcategory (if any)
-      - assign random boolean flags for keyword/inclusion/exclusion
+    Use GLiNER to predict category/subcategory spans in `text`.
+    Returns a list of annotation dicts with pre‐populated category/subcategory.
     """
-    tokens = re.findall(r'\b\w+\b', text)
-    results: List[Dict[str, Any]] = []
+    labels, label_map = load_hierarchy(CATEGORIES_PATH)
+    model = GLiNER.from_pretrained(model_name)
+    ents = model.predict_entities(text, labels, threshold=threshold)
 
-    for token in tokens:
-        sub = random.choice(subs)
-        terms = sub_to_terms.get(sub, [])
-        term = random.choice(terms) if terms else sub
-
-        results.append({
-            'text': token,
-            'subcategory': sub,
-            'term': term,
-            'keyword': random.choice([True, False]),
-            'inclusion': random.choice([True, False]),
-            'exclusion': random.choice([True, False])
+    annotations: list[dict] = []
+    for ent in ents:
+        lbl = ent.get("label", "")
+        cat, sub = label_map.get(lbl, ("", ""))
+        annotations.append({
+            "text":        ent.get("text", ""),
+            "category":    cat,
+            "subcategory": sub,
+            "term":        "",
+            "keyword":     False,
+            "inclusion":   False,
+            "exclusion":   False
         })
-
-    return results
+    return annotations
 
 def main():
-    # Expect JSON of the form {"text": "..."} on stdin
+    """
+    Reads JSON {'text': "..."} from stdin,
+    writes JSON {'result': [...]} to stdout.
+    """
     payload = json.load(sys.stdin)
-    text = payload.get('text', '')
+    text = payload.get("text", "")
 
-    # Load and merge our split-out data files
-    tree = load_tree(CATEGORY_PATH, DATASET_PATH)
-    level2_labels, sub_to_terms = build_levels(tree)
+    result = extract_annotations(text)
+    json.dump({"result": result}, sys.stdout, ensure_ascii=False)
+    sys.stdout.flush()
 
-    # Run the annotation extraction
-    annotated = extract_annotations(text, level2_labels, sub_to_terms)
-
-    # Emit as JSON on stdout
-    json.dump({'result': annotated}, sys.stdout)
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,4 +1,3 @@
-// components/DatasetFilter.tsx
 import React, { useState, useEffect, useMemo, useRef } from 'react'
 import { Category, Dataset, Annotation } from '../types'
 
@@ -53,6 +52,7 @@ export default function DatasetFilter({
   onSubmitAnnotations,
   onCancelAnnotation,
 }: DatasetFilterProps) {
+  // Colors for highlight spans
   const colors = [
     'bg-yellow-200',
     'bg-green-200',
@@ -61,7 +61,7 @@ export default function DatasetFilter({
     'bg-purple-200',
   ]
 
-  // Build category→subcategories and subcategory→terms maps
+  // Build maps: category -> subcategories, subcategory -> terms
   const categoryMap: Record<string, string[]> = {}
   const subTermsMap: Record<string, string[]> = {}
   categories.forEach(cat => {
@@ -72,7 +72,7 @@ export default function DatasetFilter({
   })
   const categoryOptions = Object.keys(categoryMap)
 
-  // Top‐pane filters
+  // Top‐pane filters logic
   const hasFilters =
     keywordList.length > 0 ||
     inclusionList.length > 0 ||
@@ -85,7 +85,7 @@ export default function DatasetFilter({
       )
     : datasets
 
-  // Annotation‐extraction state
+  // Annotation extraction state
   const [note, setNote] = useState('')
   const [extract, setExtract] = useState<AnnotationItem[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -114,7 +114,7 @@ export default function DatasetFilter({
     return html
   }, [note, extract])
 
-  // Fetch extracted annotations
+  // Call your API to extract entities via Python script
   const handleExtract = async () => {
     const res = await fetch('/api/extract-annotations', {
       method: 'POST',
@@ -122,20 +122,11 @@ export default function DatasetFilter({
       body: JSON.stringify({ text: note }),
     })
     const data = await res.json()
-    setExtract(
-      data.result.map((it: any) => ({
-        text: it.text,
-        category: '',
-        subcategory: '',
-        term: '',
-        keyword: false,
-        inclusion: false,
-        exclusion: false,
-      }))
-    )
+    // data.result is an array of { text, category, subcategory, term, keyword, inclusion, exclusion }
+    setExtract(data.result)
   }
 
-  // Row actions
+  // Row actions: remove or duplicate
   const handleRemoveExtract = (i: number) =>
     setExtract(prev => prev.filter((_, idx) => idx !== i))
   const handleDuplicateExtract = (i: number) =>
@@ -156,7 +147,7 @@ export default function DatasetFilter({
       return a
     })
 
-  // Handle category / subcategory / term changes
+  // Handle dropdown changes
   const handleCategoryChange = (i: number, v: string) =>
     setExtract(prev => {
       const a = [...prev]
@@ -300,7 +291,7 @@ export default function DatasetFilter({
             />
           </div>
 
-          {/* Extract & Add annotations */}
+          {/* Extract & Add */}
           <div className="flex justify-center mb-4 space-x-4">
             <button
               onClick={handleExtract}
@@ -345,7 +336,9 @@ export default function DatasetFilter({
                 const hl = colors[idx % colors.length]
                 return (
                   <tr key={idx} className="hover:bg-gray-50">
-                    <td className={`border px-2 py-1 ${hl}`}>{item.text}</td>
+                    <td className={`border px-2 py-1 ${hl}`}>
+                      {item.text}
+                    </td>
                     <td className="border px-2 py-1">
                       <select
                         value={item.category}
@@ -381,7 +374,9 @@ export default function DatasetFilter({
                     <td className="border px-2 py-1">
                       <select
                         value={item.term}
-                        onChange={e => handleTermChange(idx, e.target.value)}
+                        onChange={e =>
+                          handleTermChange(idx, e.target.value)
+                        }
                         className="border rounded px-1 py-0.5"
                       >
                         <option value="">None</option>
