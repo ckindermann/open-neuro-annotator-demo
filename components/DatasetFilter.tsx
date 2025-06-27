@@ -31,7 +31,7 @@ interface DatasetFilterProps {
   onCancelAnnotation: () => void
 }
 
-const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')
 
 export default function DatasetFilter({
   datasets,
@@ -88,6 +88,8 @@ export default function DatasetFilter({
   // Annotation extraction state
   const [note, setNote] = useState('')
   const [extract, setExtract] = useState<AnnotationItem[]>([])
+  // Loading state for extraction
+  const [isExtracting, setIsExtracting] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
@@ -116,14 +118,20 @@ export default function DatasetFilter({
 
   // Call your API to extract entities via Python script
   const handleExtract = async () => {
-    const res = await fetch('/api/extract-annotations', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: note }),
-    })
-    const data = await res.json()
-    // data.result is an array of { text, category, subcategory, term, keyword, inclusion, exclusion }
-    setExtract(data.result)
+    setIsExtracting(true)
+    try {
+      const res = await fetch('/api/extract-annotations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: note }),
+      })
+      const data = await res.json()
+      setExtract(data.result)
+    } catch (err) {
+      console.error('Error extracting annotations', err)
+    } finally {
+      setIsExtracting(false)
+    }
   }
 
   // Row actions: remove or duplicate
@@ -295,9 +303,24 @@ export default function DatasetFilter({
           <div className="flex justify-center mb-4 space-x-4">
             <button
               onClick={handleExtract}
-              className="px-4 py-2 bg-gray-200 rounded"
+              disabled={isExtracting}
+              className={`px-4 py-2 rounded ${
+                isExtracting
+                  ? 'bg-gray-300 cursor-not-allowed'
+                  : 'bg-gray-200 hover:bg-gray-300'
+              }`}
             >
-              Extract annotations
+              {isExtracting ? (
+                <span className="inline-flex items-center">
+                  <span
+                    className="w-4 h-4 mr-2 border-2 border-t-transparent border-gray-700 rounded-full animate-spin"
+                    aria-hidden="true"
+                  />
+                  Extracting…
+                </span>
+              ) : (
+                'Extract annotations'
+              )}
             </button>
             <button
               onClick={() => onAddAnnotations(extract)}
@@ -336,15 +359,11 @@ export default function DatasetFilter({
                 const hl = colors[idx % colors.length]
                 return (
                   <tr key={idx} className="hover:bg-gray-50">
-                    <td className={`border px-2 py-1 ${hl}`}>
-                      {item.text}
-                    </td>
+                    <td className={`${hl} border px-2 py-1`}>{item.text}</td>
                     <td className="border px-2 py-1">
                       <select
                         value={item.category}
-                        onChange={e =>
-                          handleCategoryChange(idx, e.target.value)
-                        }
+                        onChange={e => handleCategoryChange(idx, e.target.value)}
                         className="border rounded px-1 py-0.5"
                       >
                         <option value="">None</option>
@@ -358,9 +377,7 @@ export default function DatasetFilter({
                     <td className="border px-2 py-1">
                       <select
                         value={item.subcategory}
-                        onChange={e =>
-                          handleSubcategoryChange(idx, e.target.value)
-                        }
+                        onChange={e => handleSubcategoryChange(idx, e.target.value)}
                         className="border rounded px-1 py-0.5"
                       >
                         <option value="">None</option>
@@ -374,9 +391,7 @@ export default function DatasetFilter({
                     <td className="border px-2 py-1">
                       <select
                         value={item.term}
-                        onChange={e =>
-                          handleTermChange(idx, e.target.value)
-                        }
+                        onChange={e => handleTermChange(idx, e.target.value)}
                         className="border rounded px-1 py-0.5"
                       >
                         <option value="">None</option>
