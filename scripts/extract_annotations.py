@@ -150,7 +150,15 @@ def extract_annotations(text: str) -> list[dict]:
     """
     Run both the GLiNER-based vocabulary annotator and the MeSH-based annotator.
     """
-    return extract_annotation_gliner(text) + extract_annotation_mesh(text)
+    raw_results = extract_annotation_gliner(text) + extract_annotation_mesh(text)
+    seen = set()
+    deduped = []
+    for ann in raw_results:
+        key = (ann["text"], ann["vocabulary_id"])
+        if key not in seen:
+            seen.add(key)
+            deduped.append(ann)
+    return deduped
 
 def main():
     payload = json.load(sys.stdin)
