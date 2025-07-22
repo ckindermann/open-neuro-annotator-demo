@@ -722,11 +722,11 @@ export default function DatasetFilter({
         </div>
       ) : (
         <ul className="overflow-auto flex-1">
-          {filteredDatasets.map(ds => (
+          {filteredDatasets.map((ds, i) => (
             <li
               key={ds.id}
               onClick={() => onSelectDataset(ds)}
-              className="cursor-pointer py-1 hover:bg-gray-100 px-2"
+              className={`cursor-pointer py-1 hover:bg-gray-100 px-2 ${i % 2 === 0 ? 'bg-gray-200' : ''}`}
             >
               <div className="font-semibold">{ds.label}</div>
               <div className="flex flex-wrap gap-1 mt-1">
