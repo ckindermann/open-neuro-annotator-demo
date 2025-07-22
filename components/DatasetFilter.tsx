@@ -277,8 +277,17 @@ export default function DatasetFilter({
     subTermsMap: Record<string, string[]>;
   }
 
-  function CategoryAnnotationsTable({ rows, sortedExtract, colors, ...handlers }: AnnotationTableProps) {
-    const [collapsed, setCollapsed] = useState(false);
+  // Add collapsed state for each table to the parent component
+  const [collapsedTables, setCollapsedTables] = useState({
+    terms: false,
+    subcategories: false,
+    categories: false,
+  });
+  const toggleTableCollapse = (key: 'terms' | 'subcategories' | 'categories') => {
+    setCollapsedTables(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  function CategoryAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
     if (rows.length === 0) return null;
     return (
       <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
@@ -286,7 +295,7 @@ export default function DatasetFilter({
           <span>Categories</span>
           <button
             className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
-            onClick={() => setCollapsed(c => !c)}
+            onClick={onToggleCollapse}
           >
             {collapsed ? 'Expand' : 'Collapse'}
           </button>
@@ -355,8 +364,7 @@ export default function DatasetFilter({
     );
   }
 
-  function SubcategoryAnnotationsTable({ rows, sortedExtract, colors, ...handlers }: AnnotationTableProps) {
-    const [collapsed, setCollapsed] = useState(false);
+  function SubcategoryAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
     if (rows.length === 0) return null;
     return (
       <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
@@ -364,7 +372,7 @@ export default function DatasetFilter({
           <span>Subcategories</span>
           <button
             className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
-            onClick={() => setCollapsed(c => !c)}
+            onClick={onToggleCollapse}
           >
             {collapsed ? 'Expand' : 'Collapse'}
           </button>
@@ -433,8 +441,7 @@ export default function DatasetFilter({
     );
   }
 
-  function TermAnnotationsTable({ rows, sortedExtract, colors, ...handlers }: AnnotationTableProps) {
-    const [collapsed, setCollapsed] = useState(false);
+  function TermAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
     if (rows.length === 0) return null;
     return (
       <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
@@ -442,7 +449,7 @@ export default function DatasetFilter({
           <span>Terms</span>
           <button
             className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
-            onClick={() => setCollapsed(c => !c)}
+            onClick={onToggleCollapse}
           >
             {collapsed ? 'Expand' : 'Collapse'}
           </button>
@@ -658,6 +665,8 @@ export default function DatasetFilter({
                   rows={termRows}
                   sortedExtract={sortedExtract}
                   colors={colors}
+                  collapsed={collapsedTables.terms}
+                  onToggleCollapse={() => toggleTableCollapse('terms')}
                   handleCategoryChange={handleCategoryChangeById}
                   handleSubcategoryChange={handleSubcategoryChangeById}
                   handleTermChange={handleTermChangeById}
@@ -672,6 +681,8 @@ export default function DatasetFilter({
                   rows={subcategoryRows}
                   sortedExtract={sortedExtract}
                   colors={colors}
+                  collapsed={collapsedTables.subcategories}
+                  onToggleCollapse={() => toggleTableCollapse('subcategories')}
                   handleCategoryChange={handleCategoryChangeById}
                   handleSubcategoryChange={handleSubcategoryChangeById}
                   handleTermChange={handleTermChangeById}
@@ -686,6 +697,8 @@ export default function DatasetFilter({
                   rows={categoryRows}
                   sortedExtract={sortedExtract}
                   colors={colors}
+                  collapsed={collapsedTables.categories}
+                  onToggleCollapse={() => toggleTableCollapse('categories')}
                   handleCategoryChange={handleCategoryChangeById}
                   handleSubcategoryChange={handleSubcategoryChangeById}
                   handleTermChange={handleTermChangeById}
