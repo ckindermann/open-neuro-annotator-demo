@@ -45,13 +45,15 @@ export default function DatasetView({ selectedDataset, onAnnotate }: DatasetView
           {selectedDataset.license}
         </div>
       )}
-      <button
-        type="button"
-        className="absolute top-4 right-4 px-3 py-1 border rounded bg-blue-500 text-white hover:bg-blue-600"
-        onClick={onAnnotate}
-      >
-        Annotate
-      </button>
+      <div className="flex justify-center mt-6">
+        <button
+          type="button"
+          className="px-4 py-2 border rounded bg-blue-500 text-white hover:bg-blue-600"
+          onClick={onAnnotate}
+        >
+          Annotate
+        </button>
+      </div>
     </div>
   )
 }
