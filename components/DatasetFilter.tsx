@@ -678,7 +678,6 @@ export default function DatasetFilter({
           <div className="flex flex-row gap-8 flex-grow min-h-0">
             {/* Left: Abstract & Extract Button */}
             <div className="flex flex-col flex-1 min-w-0 gap-4">
-              <label className="block text-sm font-medium">Abstract</label>
               <div className="relative bg-gray-50 rounded border mb-0">
                 {/* Highlighted overlay as React elements */}
                 <div
@@ -695,7 +694,7 @@ export default function DatasetFilter({
                   className="relative w-full min-h-[6rem] max-h-[60vh] p-2 border-0 rounded resize-y bg-transparent text-transparent caret-black"
                   value={note}
                   onChange={e => setNote(e.target.value)}
-                  placeholder="Enter full paper abstract…"
+                  placeholder="Enter text …"
                   style={{ zIndex: 2, background: 'transparent', position: 'relative' }}
                   onScroll={e => {
                     const target = e.target as HTMLTextAreaElement;
