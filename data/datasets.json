@@ -21,6 +21,12 @@
         "label": "Trazodone",
         "comment": "",
         "text": "a"
+      },
+      {
+        "id": "ONVOC:0000398",
+        "label": "Psychiatric",
+        "comment": "",
+        "text": "Schizophrenia"
       }
     ],
     "inclusionTerms": [
@@ -35,6 +41,18 @@
         "label": "Normal Cognitive Development",
         "comment": "",
         "text": "ds"
+      },
+      {
+        "id": "ONVOC:0000343",
+        "label": "Age",
+        "comment": "",
+        "text": "young people"
+      },
+      {
+        "id": "ONVOC:0000107",
+        "label": "Obesity",
+        "comment": "",
+        "text": ""
       }
     ],
     "exclusionTerms": [
@@ -164,5 +182,196 @@
     "accessionNumber": "ACC-EX-003",
     "doi": "10.1000/example003",
     "license": "CC0"
+  },
+  {
+    "id": "ds-004",
+    "label": "Alzheimer’s Disease Cognitive Decline Dataset",
+    "description": "Longitudinal memory performance and imaging data in Alzheimer’s and dementia patients.",
+    "keywords": [
+      {
+        "id": "ONVOC:0000121",
+        "label": "Alzheimer's Disease",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000135",
+        "label": "Dementia",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "inclusionTerms": [
+      {
+        "id": "ONVOC:0000121",
+        "label": "Alzheimer's Disease",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000135",
+        "label": "Dementia",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "exclusionTerms": [
+      {
+        "id": "ONVOC:0000104",
+        "label": "Hypertension",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "authors": [
+      "Doe, Jane",
+      "Lee, Kevin"
+    ],
+    "accessionNumber": "ACC-EX-004",
+    "doi": "10.1000/example004",
+    "license": "CC-BY-4.0"
+  },
+  {
+    "id": "ds-005",
+    "label": "Headache Intensity and Fatigue Study",
+    "description": "Symptom diary correlating headache severity and fatigue levels in migraine patients.",
+    "keywords": [
+      {
+        "id": "ONVOC:0000118",
+        "label": "Headache",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000399",
+        "label": "Fatigue",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "inclusionTerms": [
+      {
+        "id": "ONVOC:0000118",
+        "label": "Headache",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000399",
+        "label": "Fatigue",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "exclusionTerms": [
+      {
+        "id": "ONVOC:0000407",
+        "label": "Dizziness",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "authors": [
+      "Patel, Anjali"
+    ],
+    "accessionNumber": "ACC-EX-005",
+    "doi": "10.1000/example005",
+    "license": "CC0"
+  },
+  {
+    "id": "ds-006",
+    "label": "Working Memory and Reward Responsiveness Task Dataset",
+    "description": "Behavioral and fMRI data from tasks measuring working memory and reward responsiveness.",
+    "keywords": [
+      {
+        "id": "ONVOC:0000480",
+        "label": "Working Memory",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000477",
+        "label": "Reward Responsiveness",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "inclusionTerms": [
+      {
+        "id": "ONVOC:0000480",
+        "label": "Working Memory",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000477",
+        "label": "Reward Responsiveness",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "exclusionTerms": [
+      {
+        "id": "ONVOC:0000483",
+        "label": "Declarative Memory",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "authors": [
+      "Garcia, Luis",
+      "Smith, Emma"
+    ],
+    "accessionNumber": "ACC-EX-006",
+    "doi": "10.1000/example006",
+    "license": "CC-BY-NC"
+  },
+  {
+    "id": "ds-007",
+    "label": "Visual Perception under Impaired Vision",
+    "description": "fMRI and behavioral data assessing visual perception in impaired and normal vision groups.",
+    "keywords": [
+      {
+        "id": "ONVOC:0000534",
+        "label": "Impaired Vision",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000533",
+        "label": "Normal Vision",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "inclusionTerms": [
+      {
+        "id": "ONVOC:0000532",
+        "label": "Vision",
+        "comment": "",
+        "text": ""
+      },
+      {
+        "id": "ONVOC:0000534",
+        "label": "Impaired Vision",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "exclusionTerms": [
+      {
+        "id": "ONVOC:0000535",
+        "label": "Color Blindness",
+        "comment": "",
+        "text": ""
+      }
+    ],
+    "authors": [
+      "Wang, Li",
+      "Kumar, Raj"
+    ],
+    "accessionNumber": "ACC-EX-007",
+    "doi": "10.1000/example007",
+    "license": "CC-BY-SA"
   }
 ]

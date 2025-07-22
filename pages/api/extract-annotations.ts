@@ -16,7 +16,7 @@ export default async function handler(
 
   // Wrap in a promise so Next.js waits for it
   await new Promise<void>((resolve) => {
-    const py = spawn('python3', [scriptPath])
+    const py = spawn('python3.11', [scriptPath])
     let stdoutData = ''
     let stderrData = ''
 
