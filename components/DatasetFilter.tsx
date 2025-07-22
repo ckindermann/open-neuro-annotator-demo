@@ -216,6 +216,261 @@ export default function DatasetFilter({
       return a
     })
 
+  // Group sortedExtract into categories, subcategories, and terms
+  const categoryRows = sortedExtract.filter(item => item.category && !item.subcategory && !item.term)
+  const subcategoryRows = sortedExtract.filter(item => item.subcategory && !item.term)
+  const termRows = sortedExtract.filter(item => item.term)
+
+  // Define prop types for the annotation table components
+  interface AnnotationTableProps {
+    rows: AnnotationItem[];
+    sortedExtract: AnnotationItem[];
+    colors: string[];
+    handleCategoryChange: (idx: number, v: string) => void;
+    handleSubcategoryChange: (idx: number, v: string) => void;
+    handleTermChange: (idx: number, v: string) => void;
+    toggleFlag: (idx: number, key: 'keyword' | 'inclusion' | 'exclusion') => void;
+    handleDuplicateExtract: (idx: number) => void;
+    handleRemoveExtract: (idx: number) => void;
+    categoryOptions: string[];
+    categoryMap: Record<string, string[]>;
+    subTermsMap: Record<string, string[]>;
+  }
+
+  function CategoryAnnotationsTable({ rows, sortedExtract, colors, ...handlers }: AnnotationTableProps) {
+    const [collapsed, setCollapsed] = useState(false);
+    if (rows.length === 0) return null;
+    return (
+      <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
+        <div className="font-semibold text-sm bg-gray-100 px-2 py-1 sticky top-0 z-20 flex items-center justify-between">
+          <span>Categories</span>
+          <button
+            className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
+            onClick={() => setCollapsed(c => !c)}
+          >
+            {collapsed ? 'Expand' : 'Collapse'}
+          </button>
+        </div>
+        {!collapsed && (
+          <table className="w-full table-auto border-collapse">
+            <thead className="sticky top-0 bg-white z-10">
+              <tr>
+                <th className="sticky left-0 bg-white z-10 border px-2 py-1 text-left w-40">Text</th>
+                <th className="border px-1 py-1 w-32">Category</th>
+                <th className="border px-1 py-1 w-32">Subcategory</th>
+                <th className="border px-1 py-1 w-32">Term</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Keyword">🔑</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Inclusion">➕</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Exclusion">➖</th>
+                <th className="border px-1 py-1 w-8 text-center">+</th>
+                <th className="border px-1 py-1 w-8 text-center">-</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((item, idx) => {
+                const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
+                return (
+                  <tr key={idx} className="hover:bg-gray-50 even:bg-gray-50 group">
+                    <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
+                    <td className="border px-1 py-1">
+                      <select value={item.category} onChange={e => handlers.handleCategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {handlers.categoryOptions.map(c => (<option key={c} value={c}>{c}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1">
+                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {(handlers.categoryMap[item.category] || []).map(sub => (<option key={sub} value={sub}>{sub}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1">
+                      <select value={item.term} onChange={e => handlers.handleTermChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {(handlers.subTermsMap[item.subcategory] || []).map(t => (<option key={t} value={t}>{t}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'keyword')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'inclusion')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'exclusion')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center">
+                      <button onClick={() => handlers.handleDuplicateExtract(sortedExtract.indexOf(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
+                    </td>
+                    <td className="border px-1 py-1 text-center">
+                      <button onClick={() => handlers.handleRemoveExtract(sortedExtract.indexOf(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    );
+  }
+
+  function SubcategoryAnnotationsTable({ rows, sortedExtract, colors, ...handlers }: AnnotationTableProps) {
+    const [collapsed, setCollapsed] = useState(false);
+    if (rows.length === 0) return null;
+    return (
+      <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
+        <div className="font-semibold text-sm bg-gray-100 px-2 py-1 sticky top-0 z-20 flex items-center justify-between">
+          <span>Subcategories</span>
+          <button
+            className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
+            onClick={() => setCollapsed(c => !c)}
+          >
+            {collapsed ? 'Expand' : 'Collapse'}
+          </button>
+        </div>
+        {!collapsed && (
+          <table className="w-full table-auto border-collapse">
+            <thead className="sticky top-0 bg-white z-10">
+              <tr>
+                <th className="sticky left-0 bg-white z-10 border px-2 py-1 text-left w-40">Text</th>
+                <th className="border px-1 py-1 w-32">Category</th>
+                <th className="border px-1 py-1 w-32">Subcategory</th>
+                <th className="border px-1 py-1 w-32">Term</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Keyword">🔑</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Inclusion">➕</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Exclusion">➖</th>
+                <th className="border px-1 py-1 w-8 text-center">+</th>
+                <th className="border px-1 py-1 w-8 text-center">-</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((item, idx) => {
+                const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
+                return (
+                  <tr key={idx} className="hover:bg-gray-50 even:bg-gray-50 group">
+                    <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
+                    <td className="border px-1 py-1">
+                      <select value={item.category} onChange={e => handlers.handleCategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {handlers.categoryOptions.map(c => (<option key={c} value={c}>{c}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1">
+                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {(handlers.categoryMap[item.category] || []).map(sub => (<option key={sub} value={sub}>{sub}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1">
+                      <select value={item.term} onChange={e => handlers.handleTermChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {(handlers.subTermsMap[item.subcategory] || []).map(t => (<option key={t} value={t}>{t}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'keyword')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'inclusion')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'exclusion')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center">
+                      <button onClick={() => handlers.handleDuplicateExtract(sortedExtract.indexOf(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
+                    </td>
+                    <td className="border px-1 py-1 text-center">
+                      <button onClick={() => handlers.handleRemoveExtract(sortedExtract.indexOf(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    );
+  }
+
+  function TermAnnotationsTable({ rows, sortedExtract, colors, ...handlers }: AnnotationTableProps) {
+    const [collapsed, setCollapsed] = useState(false);
+    if (rows.length === 0) return null;
+    return (
+      <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
+        <div className="font-semibold text-sm bg-gray-100 px-2 py-1 sticky top-0 z-20 flex items-center justify-between">
+          <span>Terms</span>
+          <button
+            className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
+            onClick={() => setCollapsed(c => !c)}
+          >
+            {collapsed ? 'Expand' : 'Collapse'}
+          </button>
+        </div>
+        {!collapsed && (
+          <table className="w-full table-auto border-collapse">
+            <thead className="sticky top-0 bg-white z-10">
+              <tr>
+                <th className="sticky left-0 bg-white z-10 border px-2 py-1 text-left w-40">Text</th>
+                <th className="border px-1 py-1 w-32">Category</th>
+                <th className="border px-1 py-1 w-32">Subcategory</th>
+                <th className="border px-1 py-1 w-32">Term</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Keyword">🔑</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Inclusion">➕</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Exclusion">➖</th>
+                <th className="border px-1 py-1 w-8 text-center">+</th>
+                <th className="border px-1 py-1 w-8 text-center">-</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((item, idx) => {
+                const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
+                return (
+                  <tr key={idx} className="hover:bg-gray-50 even:bg-gray-50 group">
+                    <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
+                    <td className="border px-1 py-1">
+                      <select value={item.category} onChange={e => handlers.handleCategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {handlers.categoryOptions.map(c => (<option key={c} value={c}>{c}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1">
+                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {(handlers.categoryMap[item.category] || []).map(sub => (<option key={sub} value={sub}>{sub}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1">
+                      <select value={item.term} onChange={e => handlers.handleTermChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                        <option value="">None</option>
+                        {(handlers.subTermsMap[item.subcategory] || []).map(t => (<option key={t} value={t}>{t}</option>))}
+                      </select>
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'keyword')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'inclusion')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center align-middle">
+                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'exclusion')} className="w-4 h-4 mx-auto" />
+                    </td>
+                    <td className="border px-1 py-1 text-center">
+                      <button onClick={() => handlers.handleDuplicateExtract(sortedExtract.indexOf(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
+                    </td>
+                    <td className="border px-1 py-1 text-center">
+                      <button onClick={() => handlers.handleRemoveExtract(sortedExtract.indexOf(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 border-r flex flex-col h-full">
       {/* Top filters */}
@@ -298,7 +553,7 @@ export default function DatasetFilter({
       </div>
 
       {isAnnotating ? (
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 max-w-3xl mx-auto max-h-[80vh] flex flex-col">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 max-w-3xl mx-auto max-h-[90vh] min-h-[60vh] flex flex-col">
           {/* Card Header */}
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Annotation Extraction</h2>
 
@@ -366,109 +621,50 @@ export default function DatasetFilter({
           {/* Table Header */}
           <h3 className="text-md font-semibold mb-2 border-b pb-1 flex-shrink-0">Extracted Annotations</h3>
 
-          {/* Annotation Table */}
-          <div className="overflow-x-auto overflow-y-auto max-h-64 rounded border flex-grow">
-            <table className="w-full table-auto border-collapse mb-6">
-              <thead className="sticky top-0 bg-white z-10">
-                <tr>
-                  <th className="sticky left-0 bg-white z-10 border px-2 py-1 text-left w-40">Text</th>
-                  <th className="border px-1 py-1 w-32">Category</th>
-                  <th className="border px-1 py-1 w-32">Subcategory</th>
-                  <th className="border px-1 py-1 w-32">Term</th>
-                  <th className="border px-1 py-1 w-10 text-center" title="Keyword">🔑</th>
-                  <th className="border px-1 py-1 w-10 text-center" title="Inclusion">➕</th>
-                  <th className="border px-1 py-1 w-10 text-center" title="Exclusion">➖</th>
-                  <th className="border px-1 py-1 w-8 text-center">+</th>
-                  <th className="border px-1 py-1 w-8 text-center">-</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedExtract.map((item, idx) => {
-                  const hl = colors[idx % colors.length]
-                  return (
-                    <tr key={idx} className="hover:bg-gray-50 even:bg-gray-50 group">
-                      <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>
-                        {item.text}
-                      </td>
-                      <td className="border px-1 py-1">
-                        <select
-                          value={item.category}
-                          onChange={e => handleCategoryChange(idx, e.target.value)}
-                          className="border rounded px-1 py-0.5"
-                        >
-                          <option value="">None</option>
-                          {categoryOptions.map(c => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="border px-1 py-1">
-                        <select
-                          value={item.subcategory}
-                          onChange={e => handleSubcategoryChange(idx, e.target.value)}
-                          className="border rounded px-1 py-0.5"
-                        >
-                          <option value="">None</option>
-                          {(categoryMap[item.category] || []).map(sub => (
-                            <option key={sub} value={sub}>{sub}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="border px-1 py-1">
-                        <select
-                          value={item.term}
-                          onChange={e => handleTermChange(idx, e.target.value)}
-                          className="border rounded px-1 py-0.5"
-                        >
-                          <option value="">None</option>
-                          {(subTermsMap[item.subcategory] || []).map(t => (
-                            <option key={t} value={t}>{t}</option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="border px-1 py-1 text-center align-middle">
-                        <input
-                          type="checkbox"
-                          checked={item.keyword}
-                          onChange={() => toggleFlag(idx, 'keyword')}
-                          className="w-4 h-4 mx-auto"
-                        />
-                      </td>
-                      <td className="border px-1 py-1 text-center align-middle">
-                        <input
-                          type="checkbox"
-                          checked={item.inclusion}
-                          onChange={() => toggleFlag(idx, 'inclusion')}
-                          className="w-4 h-4 mx-auto"
-                        />
-                      </td>
-                      <td className="border px-1 py-1 text-center align-middle">
-                        <input
-                          type="checkbox"
-                          checked={item.exclusion}
-                          onChange={() => toggleFlag(idx, 'exclusion')}
-                          className="w-4 h-4 mx-auto"
-                        />
-                      </td>
-                      <td className="border px-1 py-1 text-center">
-                        <button
-                          onClick={() => handleDuplicateExtract(idx)}
-                          className="text-green-500 opacity-0 group-hover:opacity-100 transition"
-                        >+
-                        </button>
-                      </td>
-                      <td className="border px-1 py-1 text-center">
-                        <button
-                          onClick={() => handleRemoveExtract(idx)}
-                          className="text-red-500 opacity-0 group-hover:opacity-100 transition"
-                        >-
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+          {/* Annotation Tables - now inside the card */}
+          <div className="flex flex-col gap-4 flex-grow overflow-y-auto">
+            <CategoryAnnotationsTable
+              rows={categoryRows}
+              sortedExtract={sortedExtract}
+              colors={colors}
+              handleCategoryChange={handleCategoryChange}
+              handleSubcategoryChange={handleSubcategoryChange}
+              handleTermChange={handleTermChange}
+              toggleFlag={toggleFlag}
+              handleDuplicateExtract={handleDuplicateExtract}
+              handleRemoveExtract={handleRemoveExtract}
+              categoryOptions={categoryOptions}
+              categoryMap={categoryMap}
+              subTermsMap={subTermsMap}
+            />
+            <SubcategoryAnnotationsTable
+              rows={subcategoryRows}
+              sortedExtract={sortedExtract}
+              colors={colors}
+              handleCategoryChange={handleCategoryChange}
+              handleSubcategoryChange={handleSubcategoryChange}
+              handleTermChange={handleTermChange}
+              toggleFlag={toggleFlag}
+              handleDuplicateExtract={handleDuplicateExtract}
+              handleRemoveExtract={handleRemoveExtract}
+              categoryOptions={categoryOptions}
+              categoryMap={categoryMap}
+              subTermsMap={subTermsMap}
+            />
+            <TermAnnotationsTable
+              rows={termRows}
+              sortedExtract={sortedExtract}
+              colors={colors}
+              handleCategoryChange={handleCategoryChange}
+              handleSubcategoryChange={handleSubcategoryChange}
+              handleTermChange={handleTermChange}
+              toggleFlag={toggleFlag}
+              handleDuplicateExtract={handleDuplicateExtract}
+              handleRemoveExtract={handleRemoveExtract}
+              categoryOptions={categoryOptions}
+              categoryMap={categoryMap}
+              subTermsMap={subTermsMap}
+            />
           </div>
 
           {/* Submit & Cancel */}
