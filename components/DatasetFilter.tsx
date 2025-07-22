@@ -9,6 +9,7 @@ interface AnnotationItem {
   keyword: boolean
   inclusion: boolean
   exclusion: boolean
+  id?: string // Added for unique identification
 }
 
 interface DatasetFilterProps {
@@ -216,6 +217,45 @@ export default function DatasetFilter({
       return a
     })
 
+  // Helper to get a unique id for an annotation item
+  function getAnnotationId(item: AnnotationItem) {
+    return item.id || `${item.text}__${item.category}__${item.subcategory}__${item.term}`;
+  }
+
+  // Update handlers to use id
+  function toggleFlagById(id: string, key: 'keyword' | 'inclusion' | 'exclusion') {
+    setExtract(prev => prev.map(item =>
+      getAnnotationId(item) === id ? { ...item, [key]: !item[key] } : item
+    ));
+  }
+  function handleDuplicateExtractById(id: string) {
+    setExtract(prev => {
+      const idx = prev.findIndex(item => getAnnotationId(item) === id);
+      if (idx === -1) return prev;
+      const copy = [...prev];
+      copy.splice(idx + 1, 0, { ...prev[idx] });
+      return copy;
+    });
+  }
+  function handleRemoveExtractById(id: string) {
+    setExtract(prev => prev.filter(item => getAnnotationId(item) !== id));
+  }
+  function handleCategoryChangeById(id: string, v: string) {
+    setExtract(prev => prev.map(item =>
+      getAnnotationId(item) === id ? { ...item, category: v, subcategory: '', term: '' } : item
+    ));
+  }
+  function handleSubcategoryChangeById(id: string, v: string) {
+    setExtract(prev => prev.map(item =>
+      getAnnotationId(item) === id ? { ...item, subcategory: v, term: '' } : item
+    ));
+  }
+  function handleTermChangeById(id: string, v: string) {
+    setExtract(prev => prev.map(item =>
+      getAnnotationId(item) === id ? { ...item, term: v } : item
+    ));
+  }
+
   // Group sortedExtract into categories, subcategories, and terms
   const categoryRows = sortedExtract.filter(item => item.category && !item.subcategory && !item.term)
   const subcategoryRows = sortedExtract.filter(item => item.subcategory && !item.term)
@@ -226,12 +266,12 @@ export default function DatasetFilter({
     rows: AnnotationItem[];
     sortedExtract: AnnotationItem[];
     colors: string[];
-    handleCategoryChange: (idx: number, v: string) => void;
-    handleSubcategoryChange: (idx: number, v: string) => void;
-    handleTermChange: (idx: number, v: string) => void;
-    toggleFlag: (idx: number, key: 'keyword' | 'inclusion' | 'exclusion') => void;
-    handleDuplicateExtract: (idx: number) => void;
-    handleRemoveExtract: (idx: number) => void;
+    handleCategoryChange: (id: string, v: string) => void;
+    handleSubcategoryChange: (id: string, v: string) => void;
+    handleTermChange: (id: string, v: string) => void;
+    toggleFlag: (id: string, key: 'keyword' | 'inclusion' | 'exclusion') => void;
+    handleDuplicateExtract: (id: string) => void;
+    handleRemoveExtract: (id: string) => void;
     categoryOptions: string[];
     categoryMap: Record<string, string[]>;
     subTermsMap: Record<string, string[]>;
@@ -270,40 +310,40 @@ export default function DatasetFilter({
               {rows.map((item, idx) => {
                 const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
                 return (
-                  <tr key={idx} className="hover:bg-gray-50 even:bg-gray-50 group">
+                  <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
                     <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
                     <td className="border px-1 py-1">
-                      <select value={item.category} onChange={e => handlers.handleCategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {handlers.categoryOptions.map(c => (<option key={c} value={c}>{c}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1">
-                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {(handlers.categoryMap[item.category] || []).map(sub => (<option key={sub} value={sub}>{sub}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1">
-                      <select value={item.term} onChange={e => handlers.handleTermChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.term} onChange={e => handlers.handleTermChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {(handlers.subTermsMap[item.subcategory] || []).map(t => (<option key={t} value={t}>{t}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'keyword')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'keyword')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'inclusion')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'inclusion')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'exclusion')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'exclusion')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center">
-                      <button onClick={() => handlers.handleDuplicateExtract(sortedExtract.indexOf(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
+                      <button onClick={() => handlers.handleDuplicateExtract(getAnnotationId(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
                     </td>
                     <td className="border px-1 py-1 text-center">
-                      <button onClick={() => handlers.handleRemoveExtract(sortedExtract.indexOf(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
+                      <button onClick={() => handlers.handleRemoveExtract(getAnnotationId(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
                     </td>
                   </tr>
                 )
@@ -348,40 +388,40 @@ export default function DatasetFilter({
               {rows.map((item, idx) => {
                 const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
                 return (
-                  <tr key={idx} className="hover:bg-gray-50 even:bg-gray-50 group">
+                  <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
                     <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
                     <td className="border px-1 py-1">
-                      <select value={item.category} onChange={e => handlers.handleCategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {handlers.categoryOptions.map(c => (<option key={c} value={c}>{c}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1">
-                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {(handlers.categoryMap[item.category] || []).map(sub => (<option key={sub} value={sub}>{sub}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1">
-                      <select value={item.term} onChange={e => handlers.handleTermChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.term} onChange={e => handlers.handleTermChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {(handlers.subTermsMap[item.subcategory] || []).map(t => (<option key={t} value={t}>{t}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'keyword')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'keyword')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'inclusion')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'inclusion')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'exclusion')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'exclusion')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center">
-                      <button onClick={() => handlers.handleDuplicateExtract(sortedExtract.indexOf(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
+                      <button onClick={() => handlers.handleDuplicateExtract(getAnnotationId(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
                     </td>
                     <td className="border px-1 py-1 text-center">
-                      <button onClick={() => handlers.handleRemoveExtract(sortedExtract.indexOf(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
+                      <button onClick={() => handlers.handleRemoveExtract(getAnnotationId(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
                     </td>
                   </tr>
                 )
@@ -426,40 +466,40 @@ export default function DatasetFilter({
               {rows.map((item, idx) => {
                 const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
                 return (
-                  <tr key={idx} className="hover:bg-gray-50 even:bg-gray-50 group">
+                  <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
                     <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
                     <td className="border px-1 py-1">
-                      <select value={item.category} onChange={e => handlers.handleCategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {handlers.categoryOptions.map(c => (<option key={c} value={c}>{c}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1">
-                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.subcategory} onChange={e => handlers.handleSubcategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {(handlers.categoryMap[item.category] || []).map(sub => (<option key={sub} value={sub}>{sub}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1">
-                      <select value={item.term} onChange={e => handlers.handleTermChange(sortedExtract.indexOf(item), e.target.value)} className="border rounded px-1 py-0.5">
+                      <select value={item.term} onChange={e => handlers.handleTermChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
                         {(handlers.subTermsMap[item.subcategory] || []).map(t => (<option key={t} value={t}>{t}</option>))}
                       </select>
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'keyword')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.keyword} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'keyword')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'inclusion')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.inclusion} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'inclusion')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center align-middle">
-                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(sortedExtract.indexOf(item), 'exclusion')} className="w-4 h-4 mx-auto" />
+                      <input type="checkbox" checked={item.exclusion} onChange={() => handlers.toggleFlag(getAnnotationId(item), 'exclusion')} className="w-4 h-4 mx-auto" />
                     </td>
                     <td className="border px-1 py-1 text-center">
-                      <button onClick={() => handlers.handleDuplicateExtract(sortedExtract.indexOf(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
+                      <button onClick={() => handlers.handleDuplicateExtract(getAnnotationId(item))} className="text-green-500 opacity-0 group-hover:opacity-100 transition">+</button>
                     </td>
                     <td className="border px-1 py-1 text-center">
-                      <button onClick={() => handlers.handleRemoveExtract(sortedExtract.indexOf(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
+                      <button onClick={() => handlers.handleRemoveExtract(getAnnotationId(item))} className="text-red-500 opacity-0 group-hover:opacity-100 transition">-</button>
                     </td>
                   </tr>
                 )
@@ -553,134 +593,131 @@ export default function DatasetFilter({
       </div>
 
       {isAnnotating ? (
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 max-w-3xl mx-auto max-h-[90vh] min-h-[60vh] flex flex-col">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 w-full max-w-full max-h-[90vh] min-h-[60vh] flex flex-col">
           {/* Card Header */}
           <h2 className="text-lg font-bold mb-4 border-b pb-2">Annotation Extraction</h2>
 
-          {/* Abstract & Highlight */}
-          <div className="mb-6 flex-shrink-0">
-            <label className="block text-sm font-medium mb-2">Abstract</label>
-            <div className="relative max-h-48 bg-gray-50 rounded border">
-              {/* Highlighted overlay as React elements */}
-              <div
-                ref={overlayRef}
-                className="absolute inset-0 p-2 whitespace-pre-wrap overflow-auto"
-                aria-hidden="true"
-                style={{ zIndex: 1, pointerEvents: 'none' }}
-              >
-                {highlightedOverlay}
+          {/* Two-column layout */}
+          <div className="flex flex-row gap-8 flex-grow min-h-0">
+            {/* Left: Abstract & Extract Button */}
+            <div className="flex flex-col flex-1 min-w-0">
+              <label className="block text-sm font-medium mb-2">Abstract</label>
+              <div className="relative max-h-48 bg-gray-50 rounded border flex-1 mb-4">
+                {/* Highlighted overlay as React elements */}
+                <div
+                  ref={overlayRef}
+                  className="absolute inset-0 p-2 whitespace-pre-wrap overflow-auto"
+                  aria-hidden="true"
+                  style={{ zIndex: 1 }}
+                >
+                  {highlightedOverlay}
+                </div>
+                {/* Textarea */}
+                <textarea
+                  ref={textareaRef}
+                  className="relative w-full h-48 p-2 border-0 rounded resize-none bg-transparent text-transparent caret-black"
+                  value={note}
+                  onChange={e => setNote(e.target.value)}
+                  placeholder="Enter full paper abstract…"
+                  style={{ zIndex: 2, background: 'transparent', position: 'relative' }}
+                  onScroll={e => {
+                    const target = e.target as HTMLTextAreaElement;
+                    if (highlightRef.current) {
+                      highlightRef.current.scrollTop = target.scrollTop;
+                      highlightRef.current.scrollLeft = target.scrollLeft;
+                    }
+                    if (overlayRef.current) {
+                      overlayRef.current.scrollTop = target.scrollTop;
+                      overlayRef.current.scrollLeft = target.scrollLeft;
+                    }
+                  }}
+                  onClick={() => {}}
+                />
               </div>
-              {/* Textarea */}
-              <textarea
-                ref={textareaRef}
-                className="relative w-full h-48 p-2 border-0 rounded resize-none bg-transparent text-transparent caret-black"
-                value={note}
-                onChange={e => setNote(e.target.value)}
-                placeholder="Enter full paper abstract…"
-                style={{ zIndex: 2, background: 'transparent', position: 'relative' }}
-                onScroll={e => {
-                  const target = e.target as HTMLTextAreaElement;
-                  if (highlightRef.current) {
-                    highlightRef.current.scrollTop = target.scrollTop;
-                    highlightRef.current.scrollLeft = target.scrollLeft;
-                  }
-                  if (overlayRef.current) {
-                    overlayRef.current.scrollTop = target.scrollTop;
-                    overlayRef.current.scrollLeft = target.scrollLeft;
-                  }
-                }}
-                onClick={() => {}}
-              />
+              <button
+                onClick={handleExtract}
+                disabled={isExtracting}
+                className={`w-full px-4 py-2 rounded shadow ${isExtracting ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
+              >
+                {isExtracting ? (
+                  <span className="inline-flex items-center">
+                    <span className="w-4 h-4 mr-2 border-2 border-t-transparent border-gray-700 rounded-full animate-spin" aria-hidden="true" />
+                    Extracting…
+                  </span>
+                ) : (
+                  'Extract annotations'
+                )}
+              </button>
             </div>
-          </div>
 
-          {/* Extract & Add Buttons */}
-          <div className="flex justify-center gap-4 mb-6 flex-shrink-0">
-            <button
-              onClick={handleExtract}
-              disabled={isExtracting}
-              className={`px-4 py-2 rounded shadow ${isExtracting ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
-            >
-              {isExtracting ? (
-                <span className="inline-flex items-center">
-                  <span className="w-4 h-4 mr-2 border-2 border-t-transparent border-gray-700 rounded-full animate-spin" aria-hidden="true" />
-                  Extracting…
-                </span>
-              ) : (
-                'Extract annotations'
-              )}
-            </button>
-            <button
-              onClick={() => onAddAnnotations(extract)}
-              className="px-4 py-2 bg-green-200 rounded shadow hover:bg-green-300"
-            >
-              Add annotations
-            </button>
-          </div>
-
-          {/* Table Header */}
-          <h3 className="text-md font-semibold mb-2 border-b pb-1 flex-shrink-0">Extracted Annotations</h3>
-
-          {/* Annotation Tables - now inside the card */}
-          <div className="flex flex-col gap-4 flex-grow overflow-y-auto">
-            <CategoryAnnotationsTable
-              rows={categoryRows}
-              sortedExtract={sortedExtract}
-              colors={colors}
-              handleCategoryChange={handleCategoryChange}
-              handleSubcategoryChange={handleSubcategoryChange}
-              handleTermChange={handleTermChange}
-              toggleFlag={toggleFlag}
-              handleDuplicateExtract={handleDuplicateExtract}
-              handleRemoveExtract={handleRemoveExtract}
-              categoryOptions={categoryOptions}
-              categoryMap={categoryMap}
-              subTermsMap={subTermsMap}
-            />
-            <SubcategoryAnnotationsTable
-              rows={subcategoryRows}
-              sortedExtract={sortedExtract}
-              colors={colors}
-              handleCategoryChange={handleCategoryChange}
-              handleSubcategoryChange={handleSubcategoryChange}
-              handleTermChange={handleTermChange}
-              toggleFlag={toggleFlag}
-              handleDuplicateExtract={handleDuplicateExtract}
-              handleRemoveExtract={handleRemoveExtract}
-              categoryOptions={categoryOptions}
-              categoryMap={categoryMap}
-              subTermsMap={subTermsMap}
-            />
-            <TermAnnotationsTable
-              rows={termRows}
-              sortedExtract={sortedExtract}
-              colors={colors}
-              handleCategoryChange={handleCategoryChange}
-              handleSubcategoryChange={handleSubcategoryChange}
-              handleTermChange={handleTermChange}
-              toggleFlag={toggleFlag}
-              handleDuplicateExtract={handleDuplicateExtract}
-              handleRemoveExtract={handleRemoveExtract}
-              categoryOptions={categoryOptions}
-              categoryMap={categoryMap}
-              subTermsMap={subTermsMap}
-            />
-          </div>
-
-          {/* Submit & Cancel */}
-          <div className="flex justify-center gap-4 flex-shrink-0 mt-4">
-            <button
-              onClick={() => onSubmitAnnotations(extract)}
-              className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600"
-            >
-              Submit Annotations
-            </button>
-            <button
-              onClick={onCancelAnnotation}
-              className="px-4 py-2 bg-gray-300 rounded shadow hover:bg-gray-400"
-            >
-              Cancel
-            </button>
+            {/* Right: Extracted Annotations & Action Buttons */}
+            <div className="flex flex-col flex-1 min-w-0">
+              <h3 className="text-md font-semibold mb-2 border-b pb-1 flex-shrink-0">Extracted Annotations</h3>
+              <div className="flex flex-col gap-4 flex-grow overflow-y-auto min-h-0">
+                <TermAnnotationsTable
+                  rows={termRows}
+                  sortedExtract={sortedExtract}
+                  colors={colors}
+                  handleCategoryChange={handleCategoryChangeById}
+                  handleSubcategoryChange={handleSubcategoryChangeById}
+                  handleTermChange={handleTermChangeById}
+                  toggleFlag={toggleFlagById}
+                  handleDuplicateExtract={handleDuplicateExtractById}
+                  handleRemoveExtract={handleRemoveExtractById}
+                  categoryOptions={categoryOptions}
+                  categoryMap={categoryMap}
+                  subTermsMap={subTermsMap}
+                />
+                <SubcategoryAnnotationsTable
+                  rows={subcategoryRows}
+                  sortedExtract={sortedExtract}
+                  colors={colors}
+                  handleCategoryChange={handleCategoryChangeById}
+                  handleSubcategoryChange={handleSubcategoryChangeById}
+                  handleTermChange={handleTermChangeById}
+                  toggleFlag={toggleFlagById}
+                  handleDuplicateExtract={handleDuplicateExtractById}
+                  handleRemoveExtract={handleRemoveExtractById}
+                  categoryOptions={categoryOptions}
+                  categoryMap={categoryMap}
+                  subTermsMap={subTermsMap}
+                />
+                <CategoryAnnotationsTable
+                  rows={categoryRows}
+                  sortedExtract={sortedExtract}
+                  colors={colors}
+                  handleCategoryChange={handleCategoryChangeById}
+                  handleSubcategoryChange={handleSubcategoryChangeById}
+                  handleTermChange={handleTermChangeById}
+                  toggleFlag={toggleFlagById}
+                  handleDuplicateExtract={handleDuplicateExtractById}
+                  handleRemoveExtract={handleRemoveExtractById}
+                  categoryOptions={categoryOptions}
+                  categoryMap={categoryMap}
+                  subTermsMap={subTermsMap}
+                />
+              </div>
+              <div className="flex justify-center gap-4 flex-shrink-0 mt-4">
+                <button
+                  onClick={() => onAddAnnotations(sortedExtract)}
+                  className="px-4 py-2 bg-green-200 rounded shadow hover:bg-green-300"
+                >
+                  Add annotations
+                </button>
+                <button
+                  onClick={() => onSubmitAnnotations(sortedExtract)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600"
+                >
+                  Submit Annotations
+                </button>
+                <button
+                  onClick={onCancelAnnotation}
+                  className="px-4 py-2 bg-gray-300 rounded shadow hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       ) : (

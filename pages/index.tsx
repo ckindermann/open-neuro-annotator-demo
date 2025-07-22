@@ -177,7 +177,7 @@ export default function Home() {
   }
 
   return (
-    <div className="grid grid-cols-[1fr_2fr_2fr] h-screen">
+    <div className="grid grid-cols-[1fr_4fr_1fr] h-screen">
       <TreeBrowser
         categories={categories}
         selectedCategory={selectedCategory}
