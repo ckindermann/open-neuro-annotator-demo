@@ -223,37 +223,87 @@ export default function DatasetFilter({
   }
 
   // Update handlers to use id
-  function toggleFlagById(id: string, key: 'keyword' | 'inclusion' | 'exclusion') {
-    setExtract(prev => prev.map(item =>
-      getAnnotationId(item) === id ? { ...item, [key]: !item[key] } : item
-    ));
+  function toggleFlagById(id: string, key: 'keyword' | 'inclusion' | 'exclusion', tableRef?: React.RefObject<HTMLDivElement>) {
+    if (tableRef) {
+      preserveScroll(tableRef, () => {
+        setExtract(prev => prev.map(item =>
+          getAnnotationId(item) === id ? { ...item, [key]: !item[key] } : item
+        ));
+      });
+    } else {
+      setExtract(prev => prev.map(item =>
+        getAnnotationId(item) === id ? { ...item, [key]: !item[key] } : item
+      ));
+    }
   }
-  function handleDuplicateExtractById(id: string) {
-    setExtract(prev => {
-      const idx = prev.findIndex(item => getAnnotationId(item) === id);
-      if (idx === -1) return prev;
-      const copy = [...prev];
-      copy.splice(idx + 1, 0, { ...prev[idx] });
-      return copy;
-    });
+  function handleDuplicateExtractById(id: string, tableRef?: React.RefObject<HTMLDivElement>) {
+    if (tableRef) {
+      preserveScroll(tableRef, () => {
+        setExtract(prev => {
+          const idx = prev.findIndex(item => getAnnotationId(item) === id);
+          if (idx === -1) return prev;
+          const copy = [...prev];
+          copy.splice(idx + 1, 0, { ...prev[idx] });
+          return copy;
+        });
+      });
+    } else {
+      setExtract(prev => {
+        const idx = prev.findIndex(item => getAnnotationId(item) === id);
+        if (idx === -1) return prev;
+        const copy = [...prev];
+        copy.splice(idx + 1, 0, { ...prev[idx] });
+        return copy;
+      });
+    }
   }
-  function handleRemoveExtractById(id: string) {
-    setExtract(prev => prev.filter(item => getAnnotationId(item) !== id));
+  function handleRemoveExtractById(id: string, tableRef?: React.RefObject<HTMLDivElement>) {
+    if (tableRef) {
+      preserveScroll(tableRef, () => {
+        setExtract(prev => prev.filter(item => getAnnotationId(item) !== id));
+      });
+    } else {
+      setExtract(prev => prev.filter(item => getAnnotationId(item) !== id));
+    }
   }
-  function handleCategoryChangeById(id: string, v: string) {
-    setExtract(prev => prev.map(item =>
-      getAnnotationId(item) === id ? { ...item, category: v, subcategory: '', term: '' } : item
-    ));
+  function handleCategoryChangeById(id: string, v: string, tableRef?: React.RefObject<HTMLDivElement>) {
+    if (tableRef) {
+      preserveScroll(tableRef, () => {
+        setExtract(prev => prev.map(item =>
+          getAnnotationId(item) === id ? { ...item, category: v, subcategory: '', term: '' } : item
+        ));
+      });
+    } else {
+      setExtract(prev => prev.map(item =>
+        getAnnotationId(item) === id ? { ...item, category: v, subcategory: '', term: '' } : item
+      ));
+    }
   }
-  function handleSubcategoryChangeById(id: string, v: string) {
-    setExtract(prev => prev.map(item =>
-      getAnnotationId(item) === id ? { ...item, subcategory: v, term: '' } : item
-    ));
+  function handleSubcategoryChangeById(id: string, v: string, tableRef?: React.RefObject<HTMLDivElement>) {
+    if (tableRef) {
+      preserveScroll(tableRef, () => {
+        setExtract(prev => prev.map(item =>
+          getAnnotationId(item) === id ? { ...item, subcategory: v, term: '' } : item
+        ));
+      });
+    } else {
+      setExtract(prev => prev.map(item =>
+        getAnnotationId(item) === id ? { ...item, subcategory: v, term: '' } : item
+      ));
+    }
   }
-  function handleTermChangeById(id: string, v: string) {
-    setExtract(prev => prev.map(item =>
-      getAnnotationId(item) === id ? { ...item, term: v } : item
-    ));
+  function handleTermChangeById(id: string, v: string, tableRef?: React.RefObject<HTMLDivElement>) {
+    if (tableRef) {
+      preserveScroll(tableRef, () => {
+        setExtract(prev => prev.map(item =>
+          getAnnotationId(item) === id ? { ...item, term: v } : item
+        ));
+      });
+    } else {
+      setExtract(prev => prev.map(item =>
+        getAnnotationId(item) === id ? { ...item, term: v } : item
+      ));
+    }
   }
 
   // Group sortedExtract into categories, subcategories, and terms
@@ -275,6 +325,7 @@ export default function DatasetFilter({
     categoryOptions: string[];
     categoryMap: Record<string, string[]>;
     subTermsMap: Record<string, string[]>;
+    tableRef?: React.RefObject<HTMLDivElement>; // Added for scroll preservation
   }
 
   // Add collapsed state for each table to the parent component
@@ -286,6 +337,25 @@ export default function DatasetFilter({
   const toggleTableCollapse = (key: 'terms' | 'subcategories' | 'categories') => {
     setCollapsedTables(prev => ({ ...prev, [key]: !prev[key] }));
   };
+
+  // Add refs for scrollable containers (assert non-null)
+  const termsTableRef = useRef<HTMLDivElement>(null!);
+  const subcategoriesTableRef = useRef<HTMLDivElement>(null!);
+  const categoriesTableRef = useRef<HTMLDivElement>(null!);
+
+  // Helper to preserve and restore scroll position
+  function preserveScroll(ref: React.RefObject<HTMLDivElement>, fn: () => void) {
+    if (!ref.current) return fn();
+    const left = ref.current.scrollLeft;
+    const top = ref.current.scrollTop;
+    fn();
+    setTimeout(() => {
+      if (ref.current) {
+        ref.current.scrollLeft = left;
+        ref.current.scrollTop = top;
+      }
+    }, 0);
+  }
 
   function CategoryAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
     if (rows.length === 0) return null;
@@ -441,10 +511,10 @@ export default function DatasetFilter({
     );
   }
 
-  function TermAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
+  function TermAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, tableRef, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void, tableRef: React.RefObject<HTMLDivElement> }) {
     if (rows.length === 0) return null;
     return (
-      <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
+      <div ref={tableRef} className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
         <div className="font-semibold text-sm bg-gray-100 px-2 py-1 sticky top-0 z-20 flex items-center justify-between">
           <span>Terms</span>
           <button
@@ -667,15 +737,16 @@ export default function DatasetFilter({
                   colors={colors}
                   collapsed={collapsedTables.terms}
                   onToggleCollapse={() => toggleTableCollapse('terms')}
-                  handleCategoryChange={handleCategoryChangeById}
-                  handleSubcategoryChange={handleSubcategoryChangeById}
-                  handleTermChange={handleTermChangeById}
-                  toggleFlag={toggleFlagById}
-                  handleDuplicateExtract={handleDuplicateExtractById}
-                  handleRemoveExtract={handleRemoveExtractById}
+                  handleCategoryChange={(id, v) => handleCategoryChangeById(id, v, termsTableRef)}
+                  handleSubcategoryChange={(id, v) => handleSubcategoryChangeById(id, v, termsTableRef)}
+                  handleTermChange={(id, v) => handleTermChangeById(id, v, termsTableRef)}
+                  toggleFlag={(id, key) => toggleFlagById(id, key, termsTableRef)}
+                  handleDuplicateExtract={id => handleDuplicateExtractById(id, termsTableRef)}
+                  handleRemoveExtract={id => handleRemoveExtractById(id, termsTableRef)}
                   categoryOptions={categoryOptions}
                   categoryMap={categoryMap}
                   subTermsMap={subTermsMap}
+                  tableRef={termsTableRef as React.RefObject<HTMLDivElement>}
                 />
                 <SubcategoryAnnotationsTable
                   rows={subcategoryRows}
@@ -683,15 +754,16 @@ export default function DatasetFilter({
                   colors={colors}
                   collapsed={collapsedTables.subcategories}
                   onToggleCollapse={() => toggleTableCollapse('subcategories')}
-                  handleCategoryChange={handleCategoryChangeById}
-                  handleSubcategoryChange={handleSubcategoryChangeById}
-                  handleTermChange={handleTermChangeById}
-                  toggleFlag={toggleFlagById}
-                  handleDuplicateExtract={handleDuplicateExtractById}
-                  handleRemoveExtract={handleRemoveExtractById}
+                  handleCategoryChange={(id, v) => handleCategoryChangeById(id, v, subcategoriesTableRef)}
+                  handleSubcategoryChange={(id, v) => handleSubcategoryChangeById(id, v, subcategoriesTableRef)}
+                  handleTermChange={(id, v) => handleTermChangeById(id, v, subcategoriesTableRef)}
+                  toggleFlag={(id, key) => toggleFlagById(id, key, subcategoriesTableRef)}
+                  handleDuplicateExtract={id => handleDuplicateExtractById(id, subcategoriesTableRef)}
+                  handleRemoveExtract={id => handleRemoveExtractById(id, subcategoriesTableRef)}
                   categoryOptions={categoryOptions}
                   categoryMap={categoryMap}
                   subTermsMap={subTermsMap}
+                  tableRef={subcategoriesTableRef as React.RefObject<HTMLDivElement>}
                 />
                 <CategoryAnnotationsTable
                   rows={categoryRows}
@@ -699,15 +771,16 @@ export default function DatasetFilter({
                   colors={colors}
                   collapsed={collapsedTables.categories}
                   onToggleCollapse={() => toggleTableCollapse('categories')}
-                  handleCategoryChange={handleCategoryChangeById}
-                  handleSubcategoryChange={handleSubcategoryChangeById}
-                  handleTermChange={handleTermChangeById}
-                  toggleFlag={toggleFlagById}
-                  handleDuplicateExtract={handleDuplicateExtractById}
-                  handleRemoveExtract={handleRemoveExtractById}
+                  handleCategoryChange={(id, v) => handleCategoryChangeById(id, v, categoriesTableRef)}
+                  handleSubcategoryChange={(id, v) => handleSubcategoryChangeById(id, v, categoriesTableRef)}
+                  handleTermChange={(id, v) => handleTermChangeById(id, v, categoriesTableRef)}
+                  toggleFlag={(id, key) => toggleFlagById(id, key, categoriesTableRef)}
+                  handleDuplicateExtract={id => handleDuplicateExtractById(id, categoriesTableRef)}
+                  handleRemoveExtract={id => handleRemoveExtractById(id, categoriesTableRef)}
                   categoryOptions={categoryOptions}
                   categoryMap={categoryMap}
                   subTermsMap={subTermsMap}
+                  tableRef={categoriesTableRef as React.RefObject<HTMLDivElement>}
                 />
               </div>
               <div className="flex justify-center gap-4 flex-shrink-0 mt-4">

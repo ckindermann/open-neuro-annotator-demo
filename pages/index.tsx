@@ -69,9 +69,13 @@ export default function Home() {
     }
     walk(categories)
 
+    // Use a Set to ensure uniqueness by id
     const newKs: Annotation[] = []
     const newIs: Annotation[] = []
     const newEs: Annotation[] = []
+    const seenK = new Set<string>()
+    const seenI = new Set<string>()
+    const seenE = new Set<string>()
 
     items.forEach(item => {
       // prefer term, then subcategory, then category
@@ -83,23 +87,41 @@ export default function Home() {
         comment: '',
         text: item.text
       }
-      if (item.keyword)   newKs.push(ann)
-      if (item.inclusion) newIs.push(ann)
-      if (item.exclusion) newEs.push(ann)
+      if (item.keyword && !seenK.has(chosenId)) {
+        newKs.push(ann)
+        seenK.add(chosenId)
+      }
+      if (item.inclusion && !seenI.has(chosenId)) {
+        newIs.push(ann)
+        seenI.add(chosenId)
+      }
+      if (item.exclusion && !seenE.has(chosenId)) {
+        newEs.push(ann)
+        seenE.add(chosenId)
+      }
     })
 
-    setKeywordList(kl => [
-      ...kl,
-      ...newKs.filter(a => !kl.some(k => k.id === a.id))
-    ])
-    setInclusionList(il => [
-      ...il,
-      ...newIs.filter(a => !il.some(i => i.id === a.id))
-    ])
-    setExclusionList(el => [
-      ...el,
-      ...newEs.filter(a => !el.some(e => e.id === a.id))
-    ])
+    setKeywordList(kl => {
+      const ids = new Set(kl.map(a => a.id))
+      return [
+        ...kl,
+        ...newKs.filter(a => !ids.has(a.id))
+      ]
+    })
+    setInclusionList(il => {
+      const ids = new Set(il.map(a => a.id))
+      return [
+        ...il,
+        ...newIs.filter(a => !ids.has(a.id))
+      ]
+    })
+    setExclusionList(el => {
+      const ids = new Set(el.map(a => a.id))
+      return [
+        ...el,
+        ...newEs.filter(a => !ids.has(a.id))
+      ]
+    })
     // remain in annotation mode
   }
 
