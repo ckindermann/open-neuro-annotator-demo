@@ -677,9 +677,9 @@ export default function DatasetFilter({
           {/* Two-column layout */}
           <div className="flex flex-row gap-8 flex-grow min-h-0">
             {/* Left: Abstract & Extract Button */}
-            <div className="flex flex-col flex-1 min-w-0">
-              <label className="block text-sm font-medium mb-2">Abstract</label>
-              <div className="relative max-h-48 bg-gray-50 rounded border flex-1 mb-4">
+            <div className="flex flex-col flex-1 min-w-0 gap-4">
+              <label className="block text-sm font-medium">Abstract</label>
+              <div className="relative bg-gray-50 rounded border mb-0">
                 {/* Highlighted overlay as React elements */}
                 <div
                   ref={overlayRef}
@@ -692,7 +692,7 @@ export default function DatasetFilter({
                 {/* Textarea */}
                 <textarea
                   ref={textareaRef}
-                  className="relative w-full h-48 p-2 border-0 rounded resize-none bg-transparent text-transparent caret-black"
+                  className="relative w-full min-h-[6rem] max-h-[60vh] p-2 border-0 rounded resize-y bg-transparent text-transparent caret-black"
                   value={note}
                   onChange={e => setNote(e.target.value)}
                   placeholder="Enter full paper abstract…"
