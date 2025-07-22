@@ -726,9 +726,20 @@ export default function DatasetFilter({
             <li
               key={ds.id}
               onClick={() => onSelectDataset(ds)}
-              className="cursor-pointer py-1 hover:bg-gray-100"
+              className="cursor-pointer py-1 hover:bg-gray-100 px-2"
             >
-              {ds.label}
+              <div className="font-semibold">{ds.label}</div>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {(ds.keywords ?? []).map(ann => (
+                  <span key={ann.id} className="bg-indigo-100 text-indigo-800 text-xs rounded px-2 py-0.5">{ann.label}</span>
+                ))}
+                {(ds.inclusionTerms ?? []).map(ann => (
+                  <span key={ann.id} className="bg-green-100 text-green-800 text-xs rounded px-2 py-0.5">{ann.label}</span>
+                ))}
+                {(ds.exclusionTerms ?? []).map(ann => (
+                  <span key={ann.id} className="bg-red-100 text-red-800 text-xs rounded px-2 py-0.5">{ann.label}</span>
+                ))}
+              </div>
             </li>
           ))}
         </ul>
