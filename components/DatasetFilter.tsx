@@ -92,6 +92,60 @@ export default function DatasetFilter({
   const [isExtracting, setIsExtracting] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const highlightRef = useRef<HTMLPreElement>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
+
+  // Before rendering the table, sort extract by first appearance in note
+  const sortedExtract = useMemo(() => {
+    return [...extract].sort((a, b) => {
+      const aIdx = note.toLowerCase().indexOf(a.text.toLowerCase());
+      const bIdx = note.toLowerCase().indexOf(b.text.toLowerCase());
+      if (aIdx === -1 && bIdx === -1) return 0;
+      if (aIdx === -1) return 1;
+      if (bIdx === -1) return -1;
+      return aIdx - bIdx;
+    });
+  }, [extract, note]);
+
+  // Render the highlighted overlay as React elements (no popover, no click handlers)
+  // Use sortedExtract for both the table and the overlay color assignment
+  const highlightedOverlay = useMemo(() => {
+    if (!note) return null
+    const elements: React.ReactNode[] = []
+    let lastIdx = 0
+    let text = note
+    // Use sortedExtract for color assignment
+    const termColors: Record<string, string> = {}
+    sortedExtract.forEach((item, idx) => {
+      if (item.text) termColors[item.text] = colors[idx % colors.length]
+    })
+    const terms = sortedExtract.map(item => escapeRegExp(item.text)).filter(Boolean)
+    if (terms.length === 0) return note
+    const regex = new RegExp(terms.join('|'), 'gi')
+    let match
+    let idx = 0
+    while ((match = regex.exec(text)) !== null) {
+      const word = match[0]
+      const start = match.index
+      const end = regex.lastIndex
+      if (start > lastIdx) {
+        elements.push(text.slice(lastIdx, start))
+      }
+      elements.push(
+        <span
+          key={idx}
+          className={termColors[word] + ' rounded px-1'}
+        >
+          {word}
+        </span>
+      )
+      lastIdx = end
+      idx++
+    }
+    if (lastIdx < text.length) {
+      elements.push(text.slice(lastIdx))
+    }
+    return elements
+  }, [note, sortedExtract, colors])
 
   useEffect(() => {
     if (isAnnotating) {
@@ -99,23 +153,6 @@ export default function DatasetFilter({
       setExtract([])
     }
   }, [isAnnotating])
-
-  const highlightedHTML = useMemo(() => {
-    let html = note
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\n/g, '<br/>')
-    extract.forEach((item, idx) => {
-      const cls = colors[idx % colors.length]
-      const token = escapeRegExp(item.text)
-      html = html.replace(
-        new RegExp(`\\b${token}\\b`, 'g'),
-        `<span class=\"${cls}\">${item.text}</span>`
-      )
-    })
-    return html
-  }, [note, extract])
 
   // Call your API to extract entities via Python script
   const handleExtract = async () => {
@@ -269,14 +306,15 @@ export default function DatasetFilter({
           <div className="mb-6 flex-shrink-0">
             <label className="block text-sm font-medium mb-2">Abstract</label>
             <div className="relative max-h-48 bg-gray-50 rounded border">
-              {/* Highlighted overlay */}
-              <pre
-                ref={highlightRef}
+              {/* Highlighted overlay as React elements */}
+              <div
+                ref={overlayRef}
                 className="absolute inset-0 p-2 whitespace-pre-wrap overflow-auto"
                 aria-hidden="true"
                 style={{ zIndex: 1, pointerEvents: 'none' }}
-                dangerouslySetInnerHTML={{ __html: highlightedHTML }}
-              />
+              >
+                {highlightedOverlay}
+              </div>
               {/* Textarea */}
               <textarea
                 ref={textareaRef}
@@ -291,7 +329,12 @@ export default function DatasetFilter({
                     highlightRef.current.scrollTop = target.scrollTop;
                     highlightRef.current.scrollLeft = target.scrollLeft;
                   }
+                  if (overlayRef.current) {
+                    overlayRef.current.scrollTop = target.scrollTop;
+                    overlayRef.current.scrollLeft = target.scrollLeft;
+                  }
                 }}
+                onClick={() => {}}
               />
             </div>
           </div>
@@ -328,18 +371,26 @@ export default function DatasetFilter({
             <table className="w-full table-auto border-collapse mb-6">
               <thead className="sticky top-0 bg-white z-10">
                 <tr>
-                  {['Text', 'Category', 'Subcategory', 'Term', 'Keyword', 'Inclusion', 'Exclusion', '+', '-'].map(col => (
-                    <th key={col} className="border px-2 py-1 bg-gray-100 text-left">{col}</th>
-                  ))}
+                  <th className="sticky left-0 bg-white z-10 border px-2 py-1 text-left w-40">Text</th>
+                  <th className="border px-1 py-1 w-32">Category</th>
+                  <th className="border px-1 py-1 w-32">Subcategory</th>
+                  <th className="border px-1 py-1 w-32">Term</th>
+                  <th className="border px-1 py-1 w-10 text-center" title="Keyword">🔑</th>
+                  <th className="border px-1 py-1 w-10 text-center" title="Inclusion">➕</th>
+                  <th className="border px-1 py-1 w-10 text-center" title="Exclusion">➖</th>
+                  <th className="border px-1 py-1 w-8 text-center">+</th>
+                  <th className="border px-1 py-1 w-8 text-center">-</th>
                 </tr>
               </thead>
               <tbody>
-                {extract.map((item, idx) => {
+                {sortedExtract.map((item, idx) => {
                   const hl = colors[idx % colors.length]
                   return (
                     <tr key={idx} className="hover:bg-gray-50 even:bg-gray-50 group">
-                      <td className={`${hl} border px-2 py-1`}>{item.text}</td>
-                      <td className="border px-2 py-1">
+                      <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>
+                        {item.text}
+                      </td>
+                      <td className="border px-1 py-1">
                         <select
                           value={item.category}
                           onChange={e => handleCategoryChange(idx, e.target.value)}
@@ -351,7 +402,7 @@ export default function DatasetFilter({
                           ))}
                         </select>
                       </td>
-                      <td className="border px-2 py-1">
+                      <td className="border px-1 py-1">
                         <select
                           value={item.subcategory}
                           onChange={e => handleSubcategoryChange(idx, e.target.value)}
@@ -363,7 +414,7 @@ export default function DatasetFilter({
                           ))}
                         </select>
                       </td>
-                      <td className="border px-2 py-1">
+                      <td className="border px-1 py-1">
                         <select
                           value={item.term}
                           onChange={e => handleTermChange(idx, e.target.value)}
@@ -375,35 +426,38 @@ export default function DatasetFilter({
                           ))}
                         </select>
                       </td>
-                      <td className="border px-2 py-1 text-center">
+                      <td className="border px-1 py-1 text-center align-middle">
                         <input
                           type="checkbox"
                           checked={item.keyword}
                           onChange={() => toggleFlag(idx, 'keyword')}
+                          className="w-4 h-4 mx-auto"
                         />
                       </td>
-                      <td className="border px-2 py-1 text-center">
+                      <td className="border px-1 py-1 text-center align-middle">
                         <input
                           type="checkbox"
                           checked={item.inclusion}
                           onChange={() => toggleFlag(idx, 'inclusion')}
+                          className="w-4 h-4 mx-auto"
                         />
                       </td>
-                      <td className="border px-2 py-1 text-center">
+                      <td className="border px-1 py-1 text-center align-middle">
                         <input
                           type="checkbox"
                           checked={item.exclusion}
                           onChange={() => toggleFlag(idx, 'exclusion')}
+                          className="w-4 h-4 mx-auto"
                         />
                       </td>
-                      <td className="border px-2 py-1 text-center">
+                      <td className="border px-1 py-1 text-center">
                         <button
                           onClick={() => handleDuplicateExtract(idx)}
                           className="text-green-500 opacity-0 group-hover:opacity-100 transition"
                         >+
                         </button>
                       </td>
-                      <td className="border px-2 py-1 text-center">
+                      <td className="border px-1 py-1 text-center">
                         <button
                           onClick={() => handleRemoveExtract(idx)}
                           className="text-red-500 opacity-0 group-hover:opacity-100 transition"
