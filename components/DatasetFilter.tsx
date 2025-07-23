@@ -151,53 +151,68 @@ export default function DatasetFilter({
     if (item.text) catColorMap[item.text + '||' + (item.category || '')] = getCategoryColor(idx)
   })
 
-  // Render the highlighted overlay as React elements (no popover, no click handlers)
-  // Use sortedExtract for both the table and the overlay color assignment
-  const highlightedOverlay = useMemo(() => {
-    if (!note) return null
-    const elements: React.ReactNode[] = []
-    let lastIdx = 0
-    let text = note
-    // Use sortedExtract for color assignment
-    const termColors: Record<string, string> = {}
+  // Robust, whitespace-preserving highlighter for the preview
+  function getHighlightPreview(text: string, sortedExtract: AnnotationItem[], termColorMap: Record<string, string>, subcatColorMap: Record<string, string>, catColorMap: Record<string, string>) {
+    if (!text || sortedExtract.length === 0) return text;
+    // Build a list of highlight ranges: { start, end, color, specificity }
+    const ranges: { start: number, end: number, color: string, specificity: number }[] = [];
     sortedExtract.forEach(item => {
+      let color = '';
+      let specificity = 0;
       if (item.term) {
-        termColors[item.text] = termColorMap[item.text + '||' + (item.term || '')]
+        color = termColorMap[item.text + '||' + (item.term || '')];
+        specificity = 3;
       } else if (item.subcategory) {
-        termColors[item.text] = subcatColorMap[item.text + '||' + (item.subcategory || '')]
+        color = subcatColorMap[item.text + '||' + (item.subcategory || '')];
+        specificity = 2;
       } else {
-        termColors[item.text] = catColorMap[item.text + '||' + (item.category || '')]
+        color = catColorMap[item.text + '||' + (item.category || '')];
+        specificity = 1;
       }
-    })
-    const terms = sortedExtract.map(item => escapeRegExp(item.text)).filter(Boolean)
-    if (terms.length === 0) return note
-    const regex = new RegExp(terms.join('|'), 'gi')
-    let match
-    let idx = 0
-    while ((match = regex.exec(text)) !== null) {
-      const word = match[0]
-      const start = match.index
-      const end = regex.lastIndex
-      if (start > lastIdx) {
-        elements.push(text.slice(lastIdx, start))
+      if (!item.text) return;
+      // Find all matches for this context
+      const regex = new RegExp(item.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        const start = match.index;
+        const end = start + item.text.length;
+        ranges.push({ start, end, color, specificity });
       }
-      elements.push(
-        <span
-          key={idx}
-          className="rounded px-1"
-          style={{ background: termColors[word], color: 'black' }}
-        >
-          {word}
-        </span>
-      )
-      lastIdx = end
-      idx++
+    });
+    // Sort ranges by start, then by -end (longer matches first), then by -specificity (most specific first)
+    ranges.sort((a, b) => a.start - b.start || b.end - a.end || b.specificity - a.specificity);
+    // For each position, keep only the most specific highlight
+    const highlightAt: Array<{ color: string } | null> = Array(text.length).fill(null);
+    for (const r of ranges) {
+      for (let i = r.start; i < r.end; ++i) {
+        if (!highlightAt[i] || r.specificity > (ranges.find(rr => rr.start <= i && rr.end > i)?.specificity || 0)) {
+          highlightAt[i] = { color: r.color };
+        }
+      }
     }
-    if (lastIdx < text.length) {
-      elements.push(text.slice(lastIdx))
+    // Build the preview as an array of React nodes
+    const nodes: React.ReactNode[] = [];
+    let lastIdx = 0;
+    while (lastIdx < text.length) {
+      const current = highlightAt[lastIdx];
+      if (!current) {
+        // Unhighlighted run
+        let next = lastIdx;
+        while (next < text.length && !highlightAt[next]) next++;
+        nodes.push(text.slice(lastIdx, next));
+        lastIdx = next;
+      } else {
+        // Highlighted run
+        let next = lastIdx;
+        while (next < text.length && highlightAt[next] && highlightAt[next]?.color === current.color) next++;
+        nodes.push(
+          <span key={lastIdx + '-' + next} style={{ background: current.color, color: 'black', borderRadius: 4, padding: '0 2px' }}>{text.slice(lastIdx, next)}</span>
+        );
+        lastIdx = next;
+      }
     }
-    return elements
-  }, [note, sortedExtract])
+    return nodes;
+  }
 
   useEffect(() => {
     if (isAnnotating) {
@@ -740,51 +755,53 @@ export default function DatasetFilter({
             {/* Left: Abstract & Extract Button */}
             <div className="flex flex-col flex-1 min-w-0 gap-4">
               <div className="relative bg-gray-50 rounded border mb-0">
-                {/* Highlighted overlay as React elements */}
-                <div
-                  ref={overlayRef}
-                  className="absolute inset-0 p-2 whitespace-pre-wrap overflow-auto"
-                  aria-hidden="true"
-                  style={{ zIndex: 1 }}
-                >
-                  {highlightedOverlay}
-                </div>
-                {/* Textarea */}
-                <textarea
-                  ref={textareaRef}
-                  className="relative w-full min-h-[6rem] max-h-[60vh] p-2 border-0 rounded resize-y bg-transparent text-transparent caret-black"
-                  value={note}
-                  onChange={e => setNote(e.target.value)}
-                  placeholder="Enter text …"
-                  style={{ zIndex: 2, background: 'transparent', position: 'relative' }}
-                  onScroll={e => {
-                    const target = e.target as HTMLTextAreaElement;
-                    if (highlightRef.current) {
-                      highlightRef.current.scrollTop = target.scrollTop;
-                      highlightRef.current.scrollLeft = target.scrollLeft;
-                    }
-                    if (overlayRef.current) {
-                      overlayRef.current.scrollTop = target.scrollTop;
-                      overlayRef.current.scrollLeft = target.scrollLeft;
-                    }
-                  }}
-                  onClick={() => {}}
-                />
-              </div>
-              <button
-                onClick={handleExtract}
-                disabled={isExtracting}
-                className={`w-full px-4 py-2 rounded shadow ${isExtracting ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                {isExtracting ? (
-                  <span className="inline-flex items-center">
-                    <span className="w-4 h-4 mr-2 border-2 border-t-transparent border-gray-700 rounded-full animate-spin" aria-hidden="true" />
-                    Extracting…
-                  </span>
+                {/* Show textarea only if not in extracted mode */}
+                {extract.length === 0 ? (
+                  <textarea
+                    ref={textareaRef}
+                    className="relative w-full min-h-[6rem] max-h-[60vh] p-2 border-0 rounded resize-y bg-transparent text-black caret-black"
+                    value={note}
+                    onChange={e => setNote(e.target.value)}
+                    placeholder="Enter text …"
+                    style={{ zIndex: 2, background: 'transparent', position: 'relative' }}
+                  />
                 ) : (
-                  'Extract annotations'
+                  <pre
+                    className="mt-0 p-2 border-0 rounded resize-y w-full min-h-[6rem] max-h-[60vh] overflow-auto whitespace-pre-wrap text-black bg-white"
+                    style={{ resize: 'vertical' }}
+                  >
+                    {getHighlightPreview(note, sortedExtract, termColorMap, subcatColorMap, catColorMap)}
+                  </pre>
                 )}
-              </button>
+              </div>
+              {/* Button below input/preview */}
+              {extract.length === 0 ? (
+                <button
+                  onClick={handleExtract}
+                  disabled={isExtracting}
+                  className={`w-full px-4 py-2 rounded shadow ${isExtracting ? 'bg-gray-300 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
+                >
+                  {isExtracting ? (
+                    <span className="inline-flex items-center">
+                      <span className="w-4 h-4 mr-2 border-2 border-t-transparent border-gray-700 rounded-full animate-spin" aria-hidden="true" />
+                      Extracting…
+                    </span>
+                  ) : (
+                    'Extract annotations'
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setNote('');
+                    setExtract([]);
+                    // Optionally reset any other annotation state if needed
+                  }}
+                  className="w-full px-4 py-2 rounded shadow bg-gray-200 hover:bg-gray-300"
+                >
+                  New input
+                </button>
+              )}
               <div className="flex items-center gap-2 mt-2">
                 <button
                   onClick={handleSaveToUserDir}
