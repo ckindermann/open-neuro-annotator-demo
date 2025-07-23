@@ -54,13 +54,26 @@ export default function DatasetFilter({
   onCancelAnnotation,
 }: DatasetFilterProps) {
   // Colors for highlight spans (original, background only)
-  const colors = [
-    'bg-yellow-200',
-    'bg-green-200',
-    'bg-blue-200',
-    'bg-pink-200',
-    'bg-purple-200',
-  ]
+  // Replace the fixed colors array with a unique color generator
+  function getColorForIndex(idx: number) {
+    // Golden angle for best distribution
+    const hue = (idx * 137.508) % 360;
+    return `hsl(${hue}, 70%, 85%)`;
+  }
+
+  // Color functions for each group
+  function getTermColor(idx: number) {
+    const hue = (idx * 137.508) % 360;
+    return `hsl(${hue}, 80%, 70%)`; // strong
+  }
+  function getSubcategoryColor(idx: number) {
+    const hue = (idx * 137.508) % 360;
+    return `hsl(${hue}, 60%, 85%)`; // medium
+  }
+  function getCategoryColor(idx: number) {
+    const hue = (idx * 137.508) % 360;
+    return `hsl(${hue}, 40%, 95%)`; // very light
+  }
 
   // Build maps: category -> subcategories, subcategory -> terms
   const categoryMap: Record<string, string[]> = {}
@@ -110,6 +123,34 @@ export default function DatasetFilter({
     });
   }, [extract, note]);
 
+  // Group sortedExtract into terms, subcategories, and categories, filtering out redundant mappings
+  const termRows = sortedExtract.filter(item => item.term)
+  const subcategoryRows = sortedExtract.filter(item =>
+    item.subcategory && !item.term &&
+    // Exclude if same string and subcategory appear in termRows
+    !termRows.some(t => t.text === item.text && t.subcategory === item.subcategory)
+  )
+  const categoryRows = sortedExtract.filter(item =>
+    item.category && !item.subcategory && !item.term &&
+    // Exclude if same string and category appear in termRows or subcategoryRows
+    !termRows.some(t => t.text === item.text && t.category === item.category) &&
+    !subcategoryRows.some(s => s.text === item.text && s.category === item.category)
+  )
+
+  // Build color maps for each group using the filtered table order
+  const termColorMap: Record<string, string> = {}
+  termRows.forEach((item, idx) => {
+    if (item.text) termColorMap[item.text + '||' + (item.term || '')] = getTermColor(idx)
+  })
+  const subcatColorMap: Record<string, string> = {}
+  subcategoryRows.forEach((item, idx) => {
+    if (item.text) subcatColorMap[item.text + '||' + (item.subcategory || '')] = getSubcategoryColor(idx)
+  })
+  const catColorMap: Record<string, string> = {}
+  categoryRows.forEach((item, idx) => {
+    if (item.text) catColorMap[item.text + '||' + (item.category || '')] = getCategoryColor(idx)
+  })
+
   // Render the highlighted overlay as React elements (no popover, no click handlers)
   // Use sortedExtract for both the table and the overlay color assignment
   const highlightedOverlay = useMemo(() => {
@@ -119,8 +160,14 @@ export default function DatasetFilter({
     let text = note
     // Use sortedExtract for color assignment
     const termColors: Record<string, string> = {}
-    sortedExtract.forEach((item, idx) => {
-      if (item.text) termColors[item.text] = colors[idx % colors.length]
+    sortedExtract.forEach(item => {
+      if (item.term) {
+        termColors[item.text] = termColorMap[item.text + '||' + (item.term || '')]
+      } else if (item.subcategory) {
+        termColors[item.text] = subcatColorMap[item.text + '||' + (item.subcategory || '')]
+      } else {
+        termColors[item.text] = catColorMap[item.text + '||' + (item.category || '')]
+      }
     })
     const terms = sortedExtract.map(item => escapeRegExp(item.text)).filter(Boolean)
     if (terms.length === 0) return note
@@ -137,7 +184,8 @@ export default function DatasetFilter({
       elements.push(
         <span
           key={idx}
-          className={termColors[word] + ' rounded px-1'}
+          className="rounded px-1"
+          style={{ background: termColors[word], color: 'black' }}
         >
           {word}
         </span>
@@ -149,7 +197,7 @@ export default function DatasetFilter({
       elements.push(text.slice(lastIdx))
     }
     return elements
-  }, [note, sortedExtract, colors])
+  }, [note, sortedExtract])
 
   useEffect(() => {
     if (isAnnotating) {
@@ -324,11 +372,6 @@ export default function DatasetFilter({
     }
   }
 
-  // Group sortedExtract into categories, subcategories, and terms
-  const categoryRows = sortedExtract.filter(item => item.category && !item.subcategory && !item.term)
-  const subcategoryRows = sortedExtract.filter(item => item.subcategory && !item.term)
-  const termRows = sortedExtract.filter(item => item.term)
-
   // Define prop types for the annotation table components
   interface AnnotationTableProps {
     rows: AnnotationItem[];
@@ -375,7 +418,7 @@ export default function DatasetFilter({
     }, 0);
   }
 
-  function CategoryAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
+  function CategoryAnnotationsTable({ rows, sortedExtract, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
     if (rows.length === 0) return null;
     return (
       <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
@@ -405,10 +448,10 @@ export default function DatasetFilter({
             </thead>
             <tbody>
               {rows.map((item, idx) => {
-                const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
+                const hl = catColorMap[item.text + '||' + (item.category || '')]
                 return (
                   <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
-                    <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
+                    <td className={`sticky left-0 z-10 border px-2 py-1`} style={{ background: hl, color: 'black' }}>{item.text}</td>
                     <td className="border px-1 py-1">
                       <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
@@ -452,7 +495,7 @@ export default function DatasetFilter({
     );
   }
 
-  function SubcategoryAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
+  function SubcategoryAnnotationsTable({ rows, sortedExtract, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
     if (rows.length === 0) return null;
     return (
       <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
@@ -482,10 +525,10 @@ export default function DatasetFilter({
             </thead>
             <tbody>
               {rows.map((item, idx) => {
-                const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
+                const hl = subcatColorMap[item.text + '||' + (item.subcategory || '')]
                 return (
                   <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
-                    <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
+                    <td className={`sticky left-0 z-10 border px-2 py-1`} style={{ background: hl, color: 'black' }}>{item.text}</td>
                     <td className="border px-1 py-1">
                       <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
@@ -529,7 +572,7 @@ export default function DatasetFilter({
     );
   }
 
-  function TermAnnotationsTable({ rows, sortedExtract, colors, collapsed, onToggleCollapse, tableRef, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void, tableRef: React.RefObject<HTMLDivElement> }) {
+  function TermAnnotationsTable({ rows, sortedExtract, collapsed, onToggleCollapse, tableRef, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void, tableRef: React.RefObject<HTMLDivElement> }) {
     if (rows.length === 0) return null;
     return (
       <div ref={tableRef} className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
@@ -559,10 +602,10 @@ export default function DatasetFilter({
             </thead>
             <tbody>
               {rows.map((item, idx) => {
-                const hl = colors[(sortedExtract.indexOf(item)) % colors.length]
+                const hl = termColorMap[item.text + '||' + (item.term || '')]
                 return (
                   <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
-                    <td className={`sticky left-0 z-10 border px-2 py-1 ${hl}`}>{item.text}</td>
+                    <td className={`sticky left-0 z-10 border px-2 py-1`} style={{ background: hl, color: 'black' }}>{item.text}</td>
                     <td className="border px-1 py-1">
                       <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
                         <option value="">None</option>
@@ -766,7 +809,7 @@ export default function DatasetFilter({
                 <TermAnnotationsTable
                   rows={termRows}
                   sortedExtract={sortedExtract}
-                  colors={colors}
+                  colors={[]} // No longer needed, colors are generated dynamically
                   collapsed={collapsedTables.terms}
                   onToggleCollapse={() => toggleTableCollapse('terms')}
                   handleCategoryChange={(id, v) => handleCategoryChangeById(id, v, termsTableRef)}
@@ -783,7 +826,7 @@ export default function DatasetFilter({
                 <SubcategoryAnnotationsTable
                   rows={subcategoryRows}
                   sortedExtract={sortedExtract}
-                  colors={colors}
+                  colors={[]} // No longer needed, colors are generated dynamically
                   collapsed={collapsedTables.subcategories}
                   onToggleCollapse={() => toggleTableCollapse('subcategories')}
                   handleCategoryChange={(id, v) => handleCategoryChangeById(id, v, subcategoriesTableRef)}
@@ -800,7 +843,7 @@ export default function DatasetFilter({
                 <CategoryAnnotationsTable
                   rows={categoryRows}
                   sortedExtract={sortedExtract}
-                  colors={colors}
+                  colors={[]} // No longer needed, colors are generated dynamically
                   collapsed={collapsedTables.categories}
                   onToggleCollapse={() => toggleTableCollapse('categories')}
                   handleCategoryChange={(id, v) => handleCategoryChangeById(id, v, categoriesTableRef)}
