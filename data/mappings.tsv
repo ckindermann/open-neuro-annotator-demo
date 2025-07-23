@@ -1,0 +1,452 @@
+vocabulary_term	vocabulary_id	mesh_term	mesh_id
+Amygdala	ONVOC:0000082	Corpus Amygdaloideums	C0002708
+Caudate Nucleus	ONVOC:0000083	Urodela	C0042058
+Globus Pallidus External Segment	ONVOC:0000085	Pallidum	C0017651
+Globus Pallidus Internal Segment	ONVOC:0000086	Pallidum	C0017651
+Habenular Nucleus	ONVOC:0000087	Habenular Nucleus	C0349718
+Hippocampus	ONVOC:0000088	Hippocampus Propers	C3887642
+Hypothalamus	ONVOC:0000089	Preoptico Hypothalamic Area	C0020663
+Nucleus Accumbens	ONVOC:0000091	Accumbens Nucleus	C0028633
+Putamen	ONVOC:0000093	Putamen	C0034169
+Red Nucleus	ONVOC:0000094	Nucleus Ruber	C0034910
+Substantia Nigra Pars Compacta	ONVOC:0000095	Substantia Nigra	C0038590
+Substantia Nigra Pars Reticulata	ONVOC:0000096	Substantia Nigra	C0038590
+Subthalamic Nucleus	ONVOC:0000097	Corpus Luysi	C0152355
+Thalamus	ONVOC:0000098	Thalamencephalon	C0039729
+Ventral Pallidum	ONVOC:0000099	Ventral Pallidum	C2328531
+Ventral Tegmental Area	ONVOC:0000100	Ventral Tegmental Area	C0175405
+Cerebellum	ONVOC:0000525	Parencephalons	C0007765
+Default mode network	ONVOC:0000516	Default Mode Network	C5380443
+Visual cortex	ONVOC:0000521	Visual Cortex	C0042817
+Anterior occipital sulcus	ONVOC:0000011	Occipital Sulcus	C1518530
+Calcarine sulcus	ONVOC:0000013	Fissures, Calcarine	C0228224
+Caudal anterior cingulate cortex	ONVOC:0000015	Cingulate Cortex	C0598179
+Caudal superior temporal sulcus, first segment	ONVOC:0000016	Temporal Sulcus	C0459389
+Caudal superior temporal sulcus, second segment	ONVOC:0000017	Temporal Sulcus	C0459389
+Caudal superior temporal sulcus, third segment	ONVOC:0000018	Temporal Sulcus	C0459389
+Cuneus	ONVOC:0000023	Cuneus Cortex	C3811911
+Dorsal prefrontal cortex	ONVOC:0000024	Cortex, Prefrontal	C0162783
+Entorhinal cortex	ONVOC:0000025	Entorhinal Cortices	C0175196
+Fusiform gyrus	ONVOC:0000029	Occipitotemporal Gyrus, Lateral	C0228243
+Inferior Frontal Gyrus	ONVOC:0000031	Gyrus Frontalis Inferior	C0152298
+Inferior frontal sulcus	ONVOC:0000032	Frontal Sulcus	C0459388
+Inferior temporal sulcus	ONVOC:0000034	Temporal Sulcus	C0459389
+Intraparietal sulcus	ONVOC:0000037	Intraparietal Sulcus	C0228213
+Isthmus cingulate cortex	ONVOC:0000038	Cingulate Cortex	C0598179
+Lateral occipital sulcus	ONVOC:0000041	Occipital Sulcus	C1518530
+Lateral orbitofrontal cortex	ONVOC:0000042	Lateral Orbitofrontal Cortex	C3853024
+Lingual gyrus	ONVOC:0000044	Linguali, Gyrus	C0152308
+Medial orbitofrontal cortex	ONVOC:0000046	Orbital Area	C2331062
+Occipitotemporal sulcus	ONVOC:0000048	Occipitotemporal Gyrus, Lateral	C0228243
+Olfactory sulcus	ONVOC:0000049	Olfactory Sulcus	C0228205
+Parahippocampal gyrus	ONVOC:0000052	Gyrus, Parahippocampal	C0228249
+Parietooccipital sulcus	ONVOC:0000053	Occipital Sulcus	C1518530
+Pericalcarine cortex	ONVOC:0000054	Area V1	C0038446
+Postcentral gyrus	ONVOC:0000055	Gyrus, Post Central	C0152302
+Posterior cingulate cortex	ONVOC:0000058	Posterior Cingulates	C0175191
+Precentral gyrus	ONVOC:0000060	Anterior Central Gyrus	C0152299
+Precuneus	ONVOC:0000062	Precuneus	C0152306
+Rostral anterior cingulate cortex	ONVOC:0000066	Cingulate Cortex	C0598179
+Subparietal sulcus	ONVOC:0000067	Intraparietal Sulcus	C0228213
+Superior frontal gyrus	ONVOC:0000068	Superior Frontal Convolution	C0152296
+Superior frontal sulcus	ONVOC:0000069	Frontal Sulcus	C0459388
+Superior parietal lobule	ONVOC:0000070	Parietal Lobule, Superior	C0152303
+Superior temporal gyrus	ONVOC:0000072	Gyrus Temporalis Superior	C0152309
+Superior temporal sulcus	ONVOC:0000073	Temporal Sulcus	C0459389
+Supramarginal gyrus	ONVOC:0000074	Brodmann's Area 40	C0228214
+Temporal gyrus	ONVOC:0000075	Temporal Gyrus	C0228234
+Transverse occipital sulcus	ONVOC:0000079	Occipital Sulcus	C1518530
+Transverse temporal gyrus	ONVOC:0000080	Heschl Convolutions	C1744621
+Ventral prefrontal cortex	ONVOC:0000081	Cortex, Prefrontal	C0162783
+Auditory cortex	ONVOC:0000524	Auditory Areas	C0004302
+Normal Vision	ONVOC:0000533	Reduced Vision	C0042798
+Impaired Vision	ONVOC:0000534	Hypoesthesia	C0020580
+Color Blindness	ONVOC:0000535	Colors	C0009393
+Amblyopia	ONVOC:0000536	Amblyopia	C0002418
+Normal Hearing	ONVOC:0000528	Audition	C0018767
+Hearing Loss	ONVOC:0000337	Loss, Hearing	C1384666
+Impaired Hearing	ONVOC:0000530	Hypoesthesia	C0020580
+Tinnitus	ONVOC:0000339	Ringing Buzzing Tinnitus	C0040264
+Headache	ONVOC:0000118	Cephalodynia	C0018681
+Migraine	ONVOC:0000119	Headaches, Migraine	C0149931
+Stroke	ONVOC:0000120	Apoplexy, Cerebrovascular	C0038454
+Alzheimer's Disease	ONVOC:0000121	Dementia, Primary Senile Degenerative	C0002395
+Epilepsy	ONVOC:0000122	Epilepsy	C0014544
+Parkinson's Disease	ONVOC:0000123	Parkinson Disease, Idiopathic	C0030567
+Multiple Sclerosis	ONVOC:0000124	MS (Multiple Sclerosis)	C0026769
+Neuropathic Pain	ONVOC:0000125	Neuralgia	C0027796
+Peripheral Neuropathy	ONVOC:0000126	Nerve Diseases, Peripheral	C4721453
+Carpal Tunnel Syndrome	ONVOC:0000127	Syndrome, Carpal Tunnel	C0007286
+Sciatica	ONVOC:0000128	Sciatic Neuralgia	C0036396
+Down Syndrome	ONVOC:0000129	Downs Syndrome	C0013080
+Dyslexia	ONVOC:0000130	Reading Disorders	C0476254
+Fragile X Syndrome	ONVOC:0000131	Fragile X Mental Retardation Syndrome	C0016667
+Prosopagnosia	ONVOC:0000132	Prosopagnosias	C0234512
+Hyperalgesia	ONVOC:0000133	Hyperalgesic Sensations	C0020429
+Fibromyalgia	ONVOC:0000134	Fibromyalgia Fibromyositis Syndrome	C0016053
+Dementia	ONVOC:0000135	Dementia	C0497327
+Hypertension	ONVOC:0000104	Blood Pressure, High	C0020538
+Hyperlipidemia	ONVOC:0000105	Hyperlipidemia	C0020473
+Type 2 Diabetes Mellitus	ONVOC:0000106	Stable Diabetes Mellitus	C0011860
+Obesity	ONVOC:0000107	Obesity	C0028754
+Osteoarthritis	ONVOC:0000108	Osteoarthritides	C0029408
+Chronic Kidney Disease	ONVOC:0000109	Disease, Chronic Renal	C1561643
+Asthma	ONVOC:0000110	Bronchial Asthma	C0004096
+Chronic Obstructive Pulmonary Disease	ONVOC:0000111	Chronic Obstructive Lung Disease	C0024117
+Coronary Artery Disease	ONVOC:0000112	Coronary Artery Diseases	C1956346
+Gastroesophageal Reflux Disease	ONVOC:0000113	Reflux, Gastro-Esophageal	C0017168
+Hypothyroidism	ONVOC:0000114	Hypothyroidisms	C0020676
+Anemia	ONVOC:0000115	Anemias	C0002871
+Cancer	ONVOC:0000116	Neoplasms, Malignant	C0006826
+Cardiovascular Disease	ONVOC:0000117	Cardiovascular Disease	C0007222
+Anxiety Disorders	ONVOC:0000136	Disorder, Anxiety	C0003469
+Phobia	ONVOC:0000137	Phobia	C0349231
+Panic Disorder	ONVOC:0000138	Disorder, Panic	C0030319
+Major Depressive Disorder	ONVOC:0000139	Depressive Disorder	C0011581
+Bipolar Disorder	ONVOC:0000140	Bipolar Mood Disorder	C0005586
+Borderline Personality Disorder	ONVOC:0000141	Disorder, Borderline Personality	C0006012
+Attention-Deficit Hyperactivity Disorder	ONVOC:0000142	Syndromes, Hyperkinetic	C1263846
+Post-Traumatic Stress Disorder	ONVOC:0000143	Post-Traumatic Neuroses	C0038436
+Obsessive-Compulsive Disorder	ONVOC:0000144	Neurosis, Obsessive-Compulsive	C0028768
+Eating Disorders	ONVOC:0000145	Disorders, Eating	C0013473
+Personality Disorders	ONVOC:0000146	Personality Disorders	C0031212
+Autism Spectrum Disorder	ONVOC:0000147	Autism Spectrum Disorder	C1510586
+Substance Use Disorders	ONVOC:0000148	Substance Use Disorders	C0038586
+Schizophrenia	ONVOC:0000149	Schizophrenic Disorders	C0036341
+Developmental Disorder	ONVOC:0000150	Neurodevelopmental Disorder	C1535926
+Psychotic Disorder	ONVOC:0000151	Disorders, Psychotic	C0033975
+Affective Psychotic Disorder	ONVOC:0000152	Disorders, Psychotic	C0033975
+Claustrophobia	ONVOC:0000153	Claustrophobia	C0008909
+Hydrocodone	ONVOC:0000284	Hydrocodon	C0020264
+Acetaminophen	ONVOC:0000285	Acetominophen	C0000970
+Oxycodone	ONVOC:0000286	Dihydrone	C0030049
+Acetaminophen	ONVOC:0000285	Acetominophen	C0000970
+Oxycodone	ONVOC:0000286	Dihydrone	C0030049
+Tramadol	ONVOC:0000287	Cyclohexanol, 2-((dimethylamino)methyl)-1-(3-methoxyphenyl)-, cis-(+-)-	C0040610
+Morphine Sulfate	ONVOC:0000288	Morphine	C0026549
+Fentanyl	ONVOC:0000289	Propanamide, N-phenyl-N-(1-(2-phenylethyl)-4-piperidinyl)-	C0015846
+Codeine	ONVOC:0000290	N Methylmorphine	C0009214
+Buprenorphine	ONVOC:0000291	6,14-Ethenomorphinan-7-methanol, 17-(cyclopropylmethyl)-alpha-(1,1-dimethylethyl)-4,5-epoxy-18,19-dihydro-3-hydroxy-6-methoxy-alpha-methyl-, (5alpha,7alpha(S))-	C0006405
+Hydromorphone	ONVOC:0000292	Dihydromorphinone	C0012306
+Tapentadol	ONVOC:0000293	Tapentadol	C2001271
+Naloxone	ONVOC:0000294	Naloxone	C0027358
+Buprenorphine	ONVOC:0000291	6,14-Ethenomorphinan-7-methanol, 17-(cyclopropylmethyl)-alpha-(1,1-dimethylethyl)-4,5-epoxy-18,19-dihydro-3-hydroxy-6-methoxy-alpha-methyl-, (5alpha,7alpha(S))-	C0006405
+Heroin	ONVOC:0000295	Diacetylmorphine	C0011892
+Donepezil	ONVOC:0000257	1H-Inden-1-one, 2,3-dihydro-5,6-dimethoxy-2-((1-(phenylmethyl)-4-piperidinyl)methyl)-	C0527316
+Rivastigmine	ONVOC:0000258	(S)-N-Ethyl-3-((1-dimethyl-amino)ethyl)-N-methylphenylcarbamate	C0649350
+Galantamine	ONVOC:0000259	Galantamin	C0016967
+Memantine	ONVOC:0000260	1-Amino-3,5-dimethyladamantane	C0025242
+Tacrine	ONVOC:0000261	1,2,3,4-Tetrahydro-9-acridinamine	C0039245
+Cannabis	ONVOC:0000238	Marihuana	C0936079
+Delta-9-Tetrahydrocannabinol	ONVOC:0000239	delta-8-tetrahydrocannabinol	C0057341
+Tetrahydrocannabivarin	ONVOC:0000240	delta(9)-Tetrahydrocannabinol	C0039663
+Cannabigerol	ONVOC:0000241	cannabigerol	C0054593
+Cannabidiol	ONVOC:0000242	1,3-Benzenediol, 2-(3-methyl-6-(1-methylethenyl)-2-cyclohexen-1-yl)-5-pentyl-, (1R-trans)-	C0006863
+Cannabichromene	ONVOC:0000243	cannabichromene	C0054589
+Propofol	ONVOC:0000173	Disoprofol	C0033487
+Sevoflurane	ONVOC:0000174	Sevoflurane	C0074414
+Desflurane	ONVOC:0000175	1,2,2,2-Tetrafluoroethyl difluoromethyl ether	C0063252
+Isoflurane	ONVOC:0000176	Ethane, 2-chloro-2-(difluoromethoxy)-1,1,1-trifluoro-	C0022180
+Nitrous Oxide	ONVOC:0000177	Laughing Gas	C0028215
+Enflurane	ONVOC:0000178	Ethane, 2-chloro-1-(difluoromethoxy)-1,1,2-trifluoro-	C0014277
+Atomoxetine	ONVOC:0000169	Atomoxetine Hydrochloride	C1170741
+Guanfacine	ONVOC:0000170	Guanfacine	C0079466
+Clonidine	ONVOC:0000171	Klofenil	C0009014
+Viloxazine	ONVOC:0000172	Morpholine, 2-((2-ethoxyphenoxy)methyl)-	C0042665
+Sumatriptan	ONVOC:0000262	Sumatriptan	C0075632
+Rizatriptan	ONVOC:0000263	N,N-dimethyl-2-(5-(1,2,4-triazol-1-ylmethyl)-1H-indole-3-yl)ethylamine	C0297635
+Eletriptan	ONVOC:0000264	(R)-3-((1-methyl-2-pyrrolidinyl)methyl)-5-(2-(phenylsulfonyl)ethyl)-1H-indole	C0759933
+Zolmitriptan	ONVOC:0000265	zolmitriptan	C0528166
+Frovatriptan	ONVOC:0000266	3-methylamino-6-carboxamido-1,2,3,4-tetrahydrocarbazole	C0754647
+Naratriptan	ONVOC:0000267	N-methyl-3-(1-methyl-4-piperidinyl)-1H-indole-5-ethanesulfonamide	C0540623
+Almotriptan	ONVOC:0000268	almotriptan	C0914729
+Lasmiditan	ONVOC:0000269	lasmiditan	C4519199
+Ubrogepant	ONVOC:0000270	ubrogepant	C4505936
+Rimegepant	ONVOC:0000271	rimegepant	C4519126
+Erenumab	ONVOC:0000272	erenumab	C4542165
+Fremanezumab	ONVOC:0000273	fremanezumab	C4549503
+Galcanezumab	ONVOC:0000274	galcanezumab	C4694273
+Atogepant	ONVOC:0000275	atogepant	C5238205
+OnabotulinumtoxinA	ONVOC:0000276	Onabotulinumtoxin A	C2719767
+Levodopa	ONVOC:0000296	L-Dopa	C0023570
+Carbidopa	ONVOC:0000297	Methyldopahydrazine	C0006982
+Pramipexole	ONVOC:0000298	2,6-Benzothiazolediamine, 4,5,6,7-tetrahydro-N6-propyl-, (S)-	C0074710
+Ropinirole	ONVOC:0000299	4-(2-(di-n-propylamino)ethyl)-2(3H)-indolone	C0244821
+Amantadine	ONVOC:0000300	1-Aminoadamantane	C0002403
+Apomorphine	ONVOC:0000301	4H-Dibenzo(de,g)quinoline-10,11-diol, 5,6,6a,7-tetrahydro-6-methyl-, (R)-	C0003596
+Selegiline	ONVOC:0000302	Selegyline	C0036579
+Rasagiline	ONVOC:0000303	N-2-propynyl-1-indanamine	C0525678
+Safinamide	ONVOC:0000304	2-(4-(3-fluorobenzyloxy)benzylamino)propionamide	C1098261
+Entacapone	ONVOC:0000305	entacapone	C0165921
+Tolcapone	ONVOC:0000306	Methanone, (3,4-dihydroxy-5-nitrophenyl)(4-methylphenyl)-	C0246330
+Istradefylline	ONVOC:0000307	8-(2-(3,4-dimethoxyphenyl)ethenyl)-1,3-diethyl-3,7-dihydro-7-methyl-1H-purine-2,6-dione	C0673470
+Rotigotine	ONVOC:0000308	rotigotine	C1700683
+Carbidopa	ONVOC:0000297	Methyldopahydrazine	C0006982
+Levodopa	ONVOC:0000296	L-Dopa	C0023570
+Entacapone	ONVOC:0000305	entacapone	C0165921
+Bromocriptine	ONVOC:0000309	2-Bromo-alpha-ergocryptine	C0006230
+Pergolide	ONVOC:0000310	Pergolide	C0031007
+Ibuprofen	ONVOC:0000179	Benzeneacetic Acid, alpha-methyl-4-(2-methylpropyl)- trimethylsilyl ester	C0020740
+Naproxen	ONVOC:0000180	Naproxen	C0027396
+Celecoxib	ONVOC:0000181	4-(5-(4-methylphenyl)-3-(trifluoromethyl)-1H-pyrazol-1-yl)benzenesulfonamide	C0538927
+Meloxicam	ONVOC:0000182	Meloxicam	C0083381
+Diclofenac	ONVOC:0000183	Dicrofenac	C0012091
+Indomethacin	ONVOC:0000184	Indometacin	C0021246
+Etodolac	ONVOC:0000185	Pyrano(3,4-b)indole-1-acetic acid, 1,8-diethyl-1,3,4,9-tetrahydro-	C0059865
+Ketoprofen	ONVOC:0000186	Benzoylhydratropic Acid	C0022635
+Piroxicam	ONVOC:0000187	2H-1,2-Benzothiazine-3-carboxamide, 4-hydroxy-2-methyl-N-2-pyridinyl-, 1,1-dioxide	C0031990
+Sulindac	ONVOC:0000188	1H-Indene-3-acetic acid, 5-fluoro-2-methyl-1-((4-(methylsulfinyl)phenyl)methylene)-, (Z)-	C0038792
+Nabumetone	ONVOC:0000189	Nabumetone	C0068334
+Etoricoxib	ONVOC:0000190	Etoricoxib	C0972314
+Oxaprozin	ONVOC:0000191	4,5 Diphenyl 2 oxazolepropionic Acid	C0069739
+Diflunisal	ONVOC:0000192	Diflunisal	C0012228
+Ketorolac	ONVOC:0000193	Ketorolac	C0073631
+Sertraline	ONVOC:0000209	1-Naphthalenamine,1,2,3,4-tetrahydro-4-(3,4-dichlorophenyl)-N-methyl-, (1S-cis)-	C0074393
+Escitalopram	ONVOC:0000210	Escitalopram	C1099456
+Fluoxetine	ONVOC:0000211	N-Methyl-gamma-(4-(trifluoromethyl)phenoxy)benzenepropanamine	C0016365
+Citalopram	ONVOC:0000212	Cytalopram	C0008845
+Bupropion	ONVOC:0000213	Amfebutamone	C0085208
+Venlafaxine	ONVOC:0000214	Venlafaxine	C0078569
+Duloxetine	ONVOC:0000215	N-methyl-3-(1-naphthalenyloxy)-2-thiophenepropanamine	C0245561
+Trazodone	ONVOC:0000216	Trazodone	C0040805
+Mirtazapine	ONVOC:0000217	Mirtazapine	C0049506
+Paroxetine	ONVOC:0000218	Piperidine, 3-((1,3-benzodioxol-5-yloxy)methyl)-4-(4-fluorophenyl)-, (3S-trans)-	C0070122
+Vilazodone	ONVOC:0000219	Vilazodone	C1530072
+Vortioxetine	ONVOC:0000220	Vortioxetine	C3661282
+Amitriptyline	ONVOC:0000221	Amitriptyline	C0002600
+Desvenlafaxine	ONVOC:0000222	O-desmethylvenlafaxine	C1880288
+Imipramine	ONVOC:0000223	Imidobenzyle	C0020934
+Alprazolam	ONVOC:0000224	4H-(1,2,4)Triazolo(4,3-a)(1,4)benzodiazepine, 8-chloro-1-methyl-6-phenyl-	C0002333
+Lorazepam	ONVOC:0000225	2H-1,4-Benzodiazepin-2-one, 7-chloro-5-(2-chlorophenyl)-1,3-dihydro-3-hydroxy-	C0024002
+Clonazepam	ONVOC:0000226	Clonazepam	C0009011
+Diazepam	ONVOC:0000227	Diazepam	C0012010
+Temazepam	ONVOC:0000228	Methyloxazepam	C0039468
+Chlordiazepoxide	ONVOC:0000229	3H-1,4-Benzodiazepin-2-amine, 7-chloro-N-methyl-5-phenyl-, 4-oxide	C0008188
+Oxazepam	ONVOC:0000230	Oxazepam	C0029997
+Clorazepate	ONVOC:0000231	Chlorazepate	C0008174
+Oxcarbazepine	ONVOC:0000232	5H-Dibenz(b,f)azepine-5-carboxamide, 10,11-dihydro-10-oxo-	C0069751
+Hydroxyzine	ONVOC:0000233	Ethanol, 2-(2-(4-((4-chlorophenyl)phenylmethyl)-1-piperazinyl)ethoxy)-	C0020404
+Propranolol	ONVOC:0000234	Propranolol	C0033497
+Buspirone	ONVOC:0000235	N-(4-(4-(2-pyrimidinyl)-1-piperazinyl)butyl)-1-cyclopentanediacetamide	C0006462
+Gabapentin	ONVOC:0000236	Gabapentin	C0060926
+Pregabalin	ONVOC:0000237	3-isobutyl GABA	C0657912
+Trazodone	ONVOC:0000216	Trazodone	C0040805
+Psilocybin	ONVOC:0000311	Psilocybin	C0033850
+3,4-Methylenedioxymethamphetamine	ONVOC:0000312	MDMA	C0115471
+Ketamine	ONVOC:0000313	Ketamine	C0022614
+Ayahuasca	ONVOC:0000314	Ayahuasca	C0330913
+Lysergic Acid Diethylamide	ONVOC:0000315	LSD	C0024334
+Dimethyltryptamine	ONVOC:0000316	N,N Dimethyltryptamine	C0027183
+Mescaline	ONVOC:0000317	Mescaline	C0025460
+Psilocin	ONVOC:0000318	psilocin	C0033848
+Ibogaine	ONVOC:0000320	Ibogaine	C0020737
+Harmine	ONVOC:0000321	Harmine	C0018605
+Harmaline	ONVOC:0000322	Harmaline	C0018602
+Salvinorin A	ONVOC:0000327	salvinorin A	C0290983
+Quetiapine	ONVOC:0000194	2-(2-(4-dibenzo(b,f)(1,4)thiazepine-11-yl-1-piperazinyl)ethoxy)ethanol	C0123091
+Aripiprazole	ONVOC:0000195	Aripiprazol	C0299792
+Risperidone	ONVOC:0000196	Risperidone	C0073393
+Olanzapine	ONVOC:0000197	Olanzapine	C0171023
+Ziprasidone	ONVOC:0000198	5-(2-(4-(3-benzisothiazolyl)piperazinyl)ethyl)-6-chloro-1,3-dihydro-2H-indol-2-one	C0380393
+Lurasidone	ONVOC:0000199	Lurasidone	C2003424
+Paliperidone	ONVOC:0000200	3-(2-(4-(6-fluoro-3-(1,2-benzisoxazolyl))-1-piperidinyl)ethyl)-6,7,8,9-tetrahydro-9-hydroxy-2-methyl-4H-pyrido(1,2-a)pyrimidin-4-one	C0753678
+Clozapine	ONVOC:0000201	Clozapine	C0009079
+Asenapine	ONVOC:0000202	trans-5-chloro-2,3,3a,12b-tetrahydro-2-methyl-1H-dibenz(2,3:6,7)oxepino(4,5-c)pyrrole	C2000088
+Brexpiprazole	ONVOC:0000203	7-(4-(4-(1-benzothiophen-4-yl)piperazin-1-yl)butoxy)quinolin-2(1H)-one	C3885614
+Cariprazine	ONVOC:0000204	cariprazine	C2936870
+Iloperidone	ONVOC:0000205	iloperidone	C0247194
+Loxapine	ONVOC:0000206	Loxapine	C0024056
+Molindone	ONVOC:0000207	4H-Indol-4-one, 3-ethyl-1,5,6,7-tetrahydro-2-methyl-5-(4-morpholinylmethyl)-	C0026388
+Pimozide	ONVOC:0000208	2H-Benzimidazol-2-one, 1-(1-(4,4-bis(4-fluorophenyl)butyl)-4-piperidinyl)-1,3-dihydro-	C0031935
+Lamotrigine	ONVOC:0000277	3,5-Diamino-6-(2,3-dichlorophenyl)-as-triazine	C0064636
+Lithium Carbonate	ONVOC:0000278	Lithium 7	C0023870
+Valproic Acid	ONVOC:0000279	Pentanoic acid, 2-propyl-	C0042291
+Carbamazepine	ONVOC:0000280	Carbamazepine	C0006949
+Oxcarbazepine	ONVOC:0000232	5H-Dibenz(b,f)azepine-5-carboxamide, 10,11-dihydro-10-oxo-	C0069751
+Topiramate	ONVOC:0000281	Topiramate	C0076829
+Gabapentin	ONVOC:0000236	Gabapentin	C0060926
+Pregabalin	ONVOC:0000237	3-isobutyl GABA	C0657912
+Tiagabine	ONVOC:0000282	Tiagabine	C0068897
+Zonisamide	ONVOC:0000283	Zonisamide	C0078844
+Ethinyl Estradiol	ONVOC:0000244	Ethynyl Estradiol	C0015011
+Levonorgestrel	ONVOC:0000245	18,19-dinorpregn-4-en-20-yn-3-one, 13-ethyl-17-hydroxy-, (17alpha)-(-)-	C0023566
+Norethindrone	ONVOC:0000246	Norethisterone	C0028356
+Norgestimate	ONVOC:0000247	norgestimate	C0068992
+Drospirenone	ONVOC:0000248	drospirenone	C0043822
+Norgestimate	ONVOC:0000247	norgestimate	C0068992
+Norethindrone	ONVOC:0000246	Norethisterone	C0028356
+Levonorgestrel	ONVOC:0000245	18,19-dinorpregn-4-en-20-yn-3-one, 13-ethyl-17-hydroxy-, (17alpha)-(-)-	C0023566
+Desogestrel	ONVOC:0000249	13 Ethyl 11 methylene 18,19 dinor 17 alpha pregn 4 en 20 yn 17 ol	C0057558
+Norgestrel	ONVOC:0000250	18,19-Dinorpregn-4-en-20-yn-3-one, 13-ethyl-17-hydroxy-, (17alpha)-(+-)-	C0028368
+Dienogest	ONVOC:0000251	19-norpregna-4,9-diene-21-nitrile, 17-hydroxy-3-oxo-, (17alpha)-	C0057916
+Nomegestrol Acetate	ONVOC:0000252	nomegestrol acetate	C0132749
+Chlormadinone Acetate	ONVOC:0000253	Chlormadinon Acetate	C0008214
+Ulipristal Acetate	ONVOC:0000254	(11beta)-17-(acetyloxy)-11-(4-(dimethylamino)phenyl)-19-norpregna-4,9-diene-3,20-dione	C2723461
+Segesterone Acetate	ONVOC:0000255	Acetate	C0000975
+Mestranol	ONVOC:0000256	19-Norpregna-1,3,5(10)-trien-20-yn-17-ol, 3-methoxy-, (17alpha)-	C0025506
+Norethindrone	ONVOC:0000246	Norethisterone	C0028356
+Amphetamine	ONVOC:0000328	Phenopromin	C0002658
+Lisdexamfetamine	ONVOC:0000329	Lisdexamfetamine	C1873633
+Dextroamphetamine	ONVOC:0000330	d Amphetamine	C0011812
+Dexmethylphenidate	ONVOC:0000331	Dexmethylphenidate	C1169997
+Methylphenidate	ONVOC:0000332	2-Piperidineacetic acid, alpha-phenyl-, methyl ester	C0025810
+Pemoline	ONVOC:0000333	4(5H)-Oxazolone, 2-amino-5-phenyl-	C0030800
+Sibling	ONVOC:0000500	Sibling	C0037047
+Parent	ONVOC:0000501	Parents	C0030551
+Child	ONVOC:0000358	Child	C0008059
+Grandparent	ONVOC:0000504	Grandparent	C0337471
+Spouse	ONVOC:0000510	Married Persons	C0162409
+Father	ONVOC:0000511	Father	C0015671
+Mother	ONVOC:0000512	Mothers	C0026591
+Adopted Child	ONVOC:0000513	Adopted Children	C0337541
+Head Injury	ONVOC:0000372	Craniocerebral Trauma	C0018674
+Brain Injury	ONVOC:0000373	Injuries, Brain	C0270611
+Abnormal Physiological Condition	ONVOC:0000374	Abnormalities, Nail	C0853087
+Spinal Cord Injury	ONVOC:0000375	Cord Injury, Spinal	C0037929
+Skull Fracture	ONVOC:0000376	Fracture, Skull	C0037304
+Pregnancy	ONVOC:0000377	Pregnancies	C0032961
+English	ONVOC:0000544	English Abstract	C0014284
+Spanish	ONVOC:0000545	Spanish American	C0019576
+Drug Use	ONVOC:0000360	Drug Users	C0338666
+Tobacco Use	ONVOC:0000361	Tobacco Consumption	C0543414
+Alcohol Use	ONVOC:0000362	Alcohol Use Disorders	C0001956
+Self-Harm	ONVOC:0000472	Intentional Self Harm	C0085271
+Drug Abuse	ONVOC:0000496	Abuse, Drug	C0013146
+Alcohol Abuse	ONVOC:0000497	Abuse, Ethanol	C0085762
+Substance Dependence	ONVOC:0000498	Dependence, Substance	C0038580
+Smoking	ONVOC:0000537	Smoking	C0037369
+Male	ONVOC:0000381	Male	C0086582
+Female	ONVOC:0000382	Female	C0086287
+Cognitive Impairment	ONVOC:0000380	Cognitive Disorder	C0338656
+Intellectual Disability	ONVOC:0000514	Intellectual Development Disorders	C3714756
+Tertiary Education	ONVOC:0000367	Education	C0013621
+Body Mass Index	ONVOC:0000391	Body Mass Index	C1305855
+Normal Body Mass Index	ONVOC:0000392	Body Mass Index	C1305855
+Normal Weight	ONVOC:0000393	Body Weight, Ideal	C0421272
+Underweight	ONVOC:0000394	Underweight	C0041667
+Overweight	ONVOC:0000395	Overweight	C0497406
+Obesity	ONVOC:0000107	Obesity	C0028754
+Asian	ONVOC:0000548	Asian Americans	C0003988
+African	ONVOC:0000549	African-American	C0085756
+African American	ONVOC:0000550	African-American	C0085756
+Black	ONVOC:0000551	Black Sea	C2936642
+Australian	ONVOC:0000552	Australia	C0004340
+European	ONVOC:0000553	People, European	C0239307
+Middle Eastern	ONVOC:0000554	Middle Eastern People	C5690845
+North American	ONVOC:0000555	North American Persons	C2700615
+Pacific Islander	ONVOC:0000556	Pacific Islanders	C5574694
+Native Hawaiian	ONVOC:0000557	Native Hawaiian	C0337920
+South American	ONVOC:0000558	American Amerind, South	C0021209
+White	ONVOC:0000559	White	C5575753
+Indian	ONVOC:0000560	Indiana	C0021206
+Alaskan Native	ONVOC:0000561	Alaskan Natives	C0682125
+East Asian	ONVOC:0000562	Asia, Eastern	C0015631
+Southeast Asian	ONVOC:0000563	Southeast Asian People	C0238697
+Left handed	ONVOC:0000369	Left Atrium	C0225860
+Adult	ONVOC:0000354	Adults	C0001675
+Elderly	ONVOC:0000355	Elderly	C0001792
+Minor	ONVOC:0000356	Minor	C0026193
+Adolesce	ONVOC:0000357	Adolescence	C0001578
+Child	ONVOC:0000358	Child	C0008059
+Infant	ONVOC:0000359	Infants	C0021270
+Case-Control Study	ONVOC:0000383	Case-Referrent Study	C0007328
+Cohort Study	ONVOC:0000384	Cohort Studies	C0009247
+Cross-Sectional Study	ONVOC:0000385	Cross-Sectional Studies	C0010362
+Longitudinal Study	ONVOC:0000386	Study, Longitudinal	C0023981
+Randomized Controlled Trial	ONVOC:0000387	Randomized Controlled Trial	C1096777
+Case Study	ONVOC:0000388	Case Study	C0085973
+Cross-Over Study	ONVOC:0000389	Cross-Over Studies	C0150097
+Twin Study	ONVOC:0000390	Twin Studies	C1096782
+Hispanic Americans	ONVOC:0000539	Spanish American	C0019576
+Hispanic	ONVOC:0000540	Spanish American	C0019576
+Latino	ONVOC:0000541	Latinos	C0086528
+French	ONVOC:0000542	Republic of Guinea	C0018381
+Human	ONVOC:0000565	Man (Taxonomy)	C0086418
+Rat	ONVOC:0000566	Rattus	C0034721
+Mouse	ONVOC:0000567	Mice	C0026809
+Rodent	ONVOC:0000568	Rodents	C0035804
+Macaque	ONVOC:0000570	Macaca	C0024398
+Marmoset	ONVOC:0000571	Short-Tusked Marmosets	C0006764
+Monkey	ONVOC:0000572	Monkey	C0026447
+Theory of Mind	ONVOC:0000488	Game Theory	C0016997
+Empathy	ONVOC:0000489	Empathy	C0013989
+Social Perception	ONVOC:0000490	Social Perception	C0037427
+Social Decision Making	ONVOC:0000492	Decision Making	C0011109
+Emotion Perception	ONVOC:0000475	Emotion	C0013987
+Emotion Regulation	ONVOC:0000476	Emotion	C0013987
+Reward Responsiveness	ONVOC:0000477	Rewards	C0035397
+Negative Valence	ONVOC:0000478	Triple Negative Breast Neoplasm	C3539878
+Working Memory	ONVOC:0000480	Memory, Short-Term	C0025265
+Short-Term Memory	ONVOC:0000481	Memory, Short-Term	C0025265
+Long-Term Memory	ONVOC:0000482	Long-Term Care	C0023977
+Procedural Memory	ONVOC:0000484	Pain, Procedural	C1619712
+Episodic Memory	ONVOC:0000485	Memory, Episodic	C0561843
+Semantic Memory	ONVOC:0000486	Semantics	C0036612
+Fatigue	ONVOC:0000399	Fatigue	C0015672
+Pain	ONVOC:0000400	Pain	C0030193
+Cough	ONVOC:0000401	Cough	C0010200
+Fever	ONVOC:0000402	Pyrexias	C0015967
+Runny Nose	ONVOC:0000404	Nose, Runny	C1260880
+Sore Throat	ONVOC:0000405	Throat, Sore	C0242429
+Headache	ONVOC:0000118	Cephalodynia	C0018681
+Gastrointestinal Issues	ONVOC:0000406	Digestive Tracts	C0017189
+Dizziness	ONVOC:0000407	Dizzyness	C0012833
+Lightheadedness	ONVOC:0000408	Lightheadedness	C0220870
+Appetite	ONVOC:0000410	Appetite	C0003618
+Skin Rashes	ONVOC:0000411	Rash	C0015230
+Skin Irritation	ONVOC:0000412	Skin	C1123023
+Swelling	ONVOC:0000413	Brain Edema	C1527311
+Edema	ONVOC:0000414	Edema	C0013604
+Shortness of Breath	ONVOC:0000415	Dyspnea	C0013404
+Dyspnea	ONVOC:0000416	Dyspnea	C0013404
+Bowel Habits	ONVOC:0000417	Habit	C0018464
+Bladder Habits	ONVOC:0000418	Bladder, Urinary	C0005682
+Chest Pain	ONVOC:0000419	Chest Pain	C0008031
+Back Pain	ONVOC:0000420	Ache, Back	C0004604
+Joint Pain	ONVOC:0000421	Arthralgia	C0003862
+Swollen Lymph Nodes	ONVOC:0000423	Nodes, Lymph	C0024204
+Headache	ONVOC:0000118	Cephalodynia	C0018681
+Pain	ONVOC:0000400	Pain	C0030193
+Fatigue	ONVOC:0000399	Fatigue	C0015672
+Dizziness	ONVOC:0000407	Dizzyness	C0012833
+Numbness	ONVOC:0000424	Hypoesthesia	C0020580
+Paresthesia	ONVOC:0000426	Paresthesia	C0030554
+Muscle Weakness	ONVOC:0000427	Weakness, Muscle	C0151786
+Memory Problems	ONVOC:0000428	Memory	C0025260
+Dysarthria	ONVOC:0000432	Dysarthosis	C0013362
+Cognitive Impairment	ONVOC:0000380	Cognitive Disorder	C0338656
+Tremors	ONVOC:0000433	Tremor	C0040822
+Seizures	ONVOC:0000434	Seizures	C0036572
+Stiffness	ONVOC:0000435	Aortic Stiffness	C3178782
+Rigidity	ONVOC:0000436	Rigidity, Nuchal	C1320474
+Dysphagia	ONVOC:0000438	Dysphagia	C0011168
+Bowel Dysfunction	ONVOC:0000439	Defecation	C0011135
+Bladder Dysfunction	ONVOC:0000440	Urinary Bladder Disorder, Neurogenic	C0005697
+Loss of Smell (Anosmia) or Taste (Ageusia)	ONVOC:0000441	Anosmia	C0003126
+Tics	ONVOC:0000442	Spasm, Habituation	C0278076
+Tinnitus	ONVOC:0000339	Ringing Buzzing Tinnitus	C0040264
+Scotoma	ONVOC:0000443	Scotoma	C0036454
+Hemianopsia	ONVOC:0000444	Hemianopsia	C0018979
+Hearing Loss	ONVOC:0000337	Loss, Hearing	C1384666
+Anxiety	ONVOC:0000445	Angst	C0003467
+Fatigue	ONVOC:0000399	Fatigue	C0015672
+Difficulty Concentrating	ONVOC:0000449	Ambulation Difficulties	C0311394
+Appetite	ONVOC:0000410	Appetite	C0003618
+Anhedonia	ONVOC:0000453	Anhedonia	C0178417
+Feelings of Worthlessness	ONVOC:0000454	Feeling	C1527305
+Feelings of Guilt	ONVOC:0000455	Guilts	C0018379
+Restlessness	ONVOC:0000456	Restlessness	C3887612
+Suicidal Thoughts	ONVOC:0000458	Suicidal Ideation	C0424000
+Panic Attacks	ONVOC:0000459	Panic Attacks	C0086769
+Obsessions	ONVOC:0000460	Obsessions	C0233697
+Sex Drive	ONVOC:0000462	Drives	C0013126
+Emotional Outbursts	ONVOC:0000463	Emotion	C0013987
+Feeling Disconnected	ONVOC:0000464	Feeling	C1527305
+Derealization	ONVOC:0000465	Derealizations	C0233754
+Depersonalization	ONVOC:0000466	Depersonalization	C0011551
+Paranoia	ONVOC:0000467	Disorder, Paranoid	C1456784
+Hallucinations	ONVOC:0000468	Hallucination	C0018524
+Delusions	ONVOC:0000469	Delusion	C0011253
+Risk-taking	ONVOC:0000470	Risk-Taking	C0035651
+Weight Gain	ONVOC:0000573	Gains, Weight	C0043094
+Weight Loss	ONVOC:0000574	Weight Reductions	C1262477
