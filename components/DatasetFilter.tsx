@@ -95,6 +95,9 @@ export default function DatasetFilter({
   const highlightRef = useRef<HTMLPreElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
 
+  // Add state for the save-to-user input
+  const [saveToUser, setSaveToUser] = useState('');
+
   // Before rendering the table, sort extract by first appearance in note
   const sortedExtract = useMemo(() => {
     return [...extract].sort((a, b) => {
@@ -171,6 +174,21 @@ export default function DatasetFilter({
     } finally {
       setIsExtracting(false)
     }
+  }
+
+  // Add handler for save-to-user
+  async function handleSaveToUserDir() {
+    if (!saveToUser.trim()) return;
+    await fetch('/api/save-user-annotations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user: saveToUser.trim(),
+        annotations: extract,
+        text: note,
+      }),
+    });
+    // Optionally show a success message
   }
 
   // Row actions: remove or duplicate
@@ -724,6 +742,21 @@ export default function DatasetFilter({
                   'Extract annotations'
                 )}
               </button>
+              <div className="flex items-center gap-2 mt-2">
+                <button
+                  onClick={handleSaveToUserDir}
+                  className="px-4 py-2 rounded bg-indigo-500 text-white hover:bg-indigo-600"
+                >
+                  Save to
+                </button>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 flex-1"
+                  placeholder="user directory"
+                  value={saveToUser}
+                  onChange={e => setSaveToUser(e.target.value)}
+                />
+              </div>
             </div>
 
             {/* Right: Extracted Annotations & Action Buttons */}
