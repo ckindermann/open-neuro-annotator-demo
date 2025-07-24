@@ -455,8 +455,8 @@ export default function DatasetFilter({
                 <th className="border px-1 py-1 w-32">Subcategory</th>
                 <th className="border px-1 py-1 w-32">Term</th>
                 <th className="border px-1 py-1 w-10 text-center" title="Keyword">🔑</th>
-                <th className="border px-1 py-1 w-10 text-center" title="Inclusion">➕</th>
-                <th className="border px-1 py-1 w-10 text-center" title="Exclusion">➖</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Inclusion"><span role="img" aria-label="Inclusion" className="text-green-600">✅</span></th>
+                <th className="border px-1 py-1 w-10 text-center" title="Exclusion"><span role="img" aria-label="Exclusion" className="text-red-600">🛑</span></th>
                 <th className="border px-1 py-1 w-8 text-center">+</th>
                 <th className="border px-1 py-1 w-8 text-center">-</th>
               </tr>
@@ -532,8 +532,8 @@ export default function DatasetFilter({
                 <th className="border px-1 py-1 w-32">Subcategory</th>
                 <th className="border px-1 py-1 w-32">Term</th>
                 <th className="border px-1 py-1 w-10 text-center" title="Keyword">🔑</th>
-                <th className="border px-1 py-1 w-10 text-center" title="Inclusion">➕</th>
-                <th className="border px-1 py-1 w-10 text-center" title="Exclusion">➖</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Inclusion"><span role="img" aria-label="Inclusion" className="text-green-600">✅</span></th>
+                <th className="border px-1 py-1 w-10 text-center" title="Exclusion"><span role="img" aria-label="Exclusion" className="text-red-600">🛑</span></th>
                 <th className="border px-1 py-1 w-8 text-center">+</th>
                 <th className="border px-1 py-1 w-8 text-center">-</th>
               </tr>
@@ -609,8 +609,8 @@ export default function DatasetFilter({
                 <th className="border px-1 py-1 w-32">Subcategory</th>
                 <th className="border px-1 py-1 w-32">Term</th>
                 <th className="border px-1 py-1 w-10 text-center" title="Keyword">🔑</th>
-                <th className="border px-1 py-1 w-10 text-center" title="Inclusion">➕</th>
-                <th className="border px-1 py-1 w-10 text-center" title="Exclusion">➖</th>
+                <th className="border px-1 py-1 w-10 text-center" title="Inclusion"><span role="img" aria-label="Inclusion" className="text-green-600">✅</span></th>
+                <th className="border px-1 py-1 w-10 text-center" title="Exclusion"><span role="img" aria-label="Exclusion" className="text-red-600">🛑</span></th>
                 <th className="border px-1 py-1 w-8 text-center">+</th>
                 <th className="border px-1 py-1 w-8 text-center">-</th>
               </tr>
