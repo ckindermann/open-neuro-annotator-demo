@@ -510,10 +510,10 @@ export default function DatasetFilter({
     );
   }
 
-  function SubcategoryAnnotationsTable({ rows, sortedExtract, collapsed, onToggleCollapse, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void }) {
+  function SubcategoryAnnotationsTable({ rows, sortedExtract, collapsed, onToggleCollapse, tableRef, ...handlers }: AnnotationTableProps & { collapsed: boolean, onToggleCollapse: () => void, tableRef: React.RefObject<HTMLDivElement> }) {
     if (rows.length === 0) return null;
     return (
-      <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
+      <div ref={tableRef} className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
         <div className="font-semibold text-sm bg-gray-100 px-2 py-1 sticky top-0 z-20 flex items-center justify-between">
           <span>Subcategories</span>
           <button
