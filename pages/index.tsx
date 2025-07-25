@@ -30,6 +30,10 @@ export default function Home() {
   const [exclusionList, setExclusionList] = useState<Annotation[]>([])
   const [isAnnotating, setIsAnnotating] = useState(false)
 
+  // Collapsible panel states
+  const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false)
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false)
+
   // Helper to update our in‐memory datasets (and selected)
   const updateDataset = (id: string, fn: (ds: Dataset) => Dataset) => {
     setDatasets(prev => prev.map(ds => (ds.id === id ? fn(ds) : ds)))
@@ -51,7 +55,7 @@ export default function Home() {
   }
   const handleCancelAnnotation = () => setIsAnnotating(false)
 
-  // 1) “Add annotations” merges the current table items into the in‐memory lists, stays in annotation mode
+  // 1) "Add annotations" merges the current table items into the in‐memory lists, stays in annotation mode
   const handleAddAnnotations = (items: AnnotationItem[]) => {
     // Build a map label → id for categories, subcats, and terms
     const labelToId = new Map<string,string>()
@@ -125,7 +129,7 @@ export default function Home() {
     // remain in annotation mode
   }
 
-  // 2) “Submit Annotations” writes out and exits annotation mode (unchanged)
+  // 2) "Submit Annotations" writes out and exits annotation mode (unchanged)
   const handleSubmitAnnotations = async (items: AnnotationItem[]) => {
     if (!selectedDataset) return
 
@@ -199,28 +203,51 @@ export default function Home() {
   }
 
   return (
-    <div className="grid grid-cols-[1fr_4fr_1fr] h-screen">
-      <TreeBrowser
-        categories={categories}
-        selectedCategory={selectedCategory}
-        onSelectCategory={handleSelectCategory}
-        onAddKeyword={ann =>
-          setKeywordList(list =>
-            list.some(a => a.id === ann.id) ? list : [...list, ann]
-          )
-        }
-        onAddInclusion={ann =>
-          setInclusionList(list =>
-            list.some(a => a.id === ann.id) ? list : [...list, ann]
-          )
-        }
-        onAddExclusion={ann =>
-          setExclusionList(list =>
-            list.some(a => a.id === ann.id) ? list : [...list, ann]
-          )
-        }
-      />
+    <div className="grid grid-cols-[auto_1fr_auto] h-screen">
+      {/* Left Panel - TreeBrowser */}
+      <div className="relative">
+        {leftPanelCollapsed ? (
+          <button
+            onClick={() => setLeftPanelCollapsed(false)}
+            className="h-full w-8 bg-gray-100 hover:bg-gray-200 border-r flex items-center justify-center transition-colors"
+            title="Expand vocabulary panel"
+          >
+            <span className="text-gray-600 text-lg">→</span>
+          </button>
+        ) : (
+          <div className="relative">
+            <TreeBrowser
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={handleSelectCategory}
+              onAddKeyword={ann =>
+                setKeywordList(list =>
+                  list.some(a => a.id === ann.id) ? list : [...list, ann]
+                )
+              }
+              onAddInclusion={ann =>
+                setInclusionList(list =>
+                  list.some(a => a.id === ann.id) ? list : [...list, ann]
+                )
+              }
+              onAddExclusion={ann =>
+                setExclusionList(list =>
+                  list.some(a => a.id === ann.id) ? list : [...list, ann]
+                )
+              }
+            />
+            <button
+              onClick={() => setLeftPanelCollapsed(true)}
+              className="absolute top-2 right-2 w-6 h-6 bg-white hover:bg-gray-100 border rounded flex items-center justify-center text-gray-600 text-sm transition-colors"
+              title="Collapse vocabulary panel"
+            >
+              ←
+            </button>
+          </div>
+        )}
+      </div>
 
+      {/* Center Panel - DatasetFilter */}
       <DatasetFilter
         datasets={datasets}
         categories={categories}
@@ -247,10 +274,32 @@ export default function Home() {
         onCancelAnnotation={handleCancelAnnotation}
       />
 
-      <DatasetView
-        selectedDataset={selectedDataset}
-        onAnnotate={handleAnnotate}
-      />
+      {/* Right Panel - DatasetView */}
+      <div className="relative">
+        {rightPanelCollapsed ? (
+          <button
+            onClick={() => setRightPanelCollapsed(false)}
+            className="h-full w-8 bg-gray-100 hover:bg-gray-200 border-l flex items-center justify-center transition-colors"
+            title="Expand dataset details panel"
+          >
+            <span className="text-gray-600 text-lg">←</span>
+          </button>
+        ) : (
+          <div className="relative">
+            <DatasetView
+              selectedDataset={selectedDataset}
+              onAnnotate={handleAnnotate}
+            />
+            <button
+              onClick={() => setRightPanelCollapsed(true)}
+              className="absolute top-2 left-2 w-6 h-6 bg-white hover:bg-gray-100 border rounded flex items-center justify-center text-gray-600 text-sm transition-colors"
+              title="Collapse dataset details panel"
+            >
+              →
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
