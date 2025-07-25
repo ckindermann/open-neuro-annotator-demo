@@ -300,7 +300,9 @@ export default function DatasetFilter({
 
   // Helper to get a unique id for an annotation item
   function getAnnotationId(item: AnnotationItem) {
-    return item.id || `${item.text}__${item.category}__${item.subcategory}__${item.term}`;
+    if (item.id) return item.id;
+    // Generate a unique ID based on content and timestamp if no ID exists
+    return `${item.text}__${item.category}__${item.subcategory}__${item.term}__${Date.now()}`;
   }
 
   // Update handlers to use id
@@ -324,7 +326,13 @@ export default function DatasetFilter({
           const idx = prev.findIndex(item => getAnnotationId(item) === id);
           if (idx === -1) return prev;
           const copy = [...prev];
-          copy.splice(idx + 1, 0, { ...prev[idx] });
+          const originalItem = prev[idx];
+          // Create a deep copy with a new unique ID
+          const duplicatedItem = {
+            ...originalItem,
+            id: `${originalItem.text}__${originalItem.category}__${originalItem.subcategory}__${originalItem.term}__${Date.now()}_${Math.random()}`
+          };
+          copy.splice(idx + 1, 0, duplicatedItem);
           return copy;
         });
       });
@@ -333,7 +341,13 @@ export default function DatasetFilter({
         const idx = prev.findIndex(item => getAnnotationId(item) === id);
         if (idx === -1) return prev;
         const copy = [...prev];
-        copy.splice(idx + 1, 0, { ...prev[idx] });
+        const originalItem = prev[idx];
+        // Create a deep copy with a new unique ID
+        const duplicatedItem = {
+          ...originalItem,
+          id: `${originalItem.text}__${originalItem.category}__${originalItem.subcategory}__${originalItem.term}__${Date.now()}_${Math.random()}`
+        };
+        copy.splice(idx + 1, 0, duplicatedItem);
         return copy;
       });
     }
