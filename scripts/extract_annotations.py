@@ -8,6 +8,15 @@ import spacy
 from scispacy.linking import EntityLinker
 from gliner import GLiNER
 
+import sys
+sys.path.append(str(Path(__file__).parent))
+import text2term
+import pandas as pd
+import logging
+
+# Configure logging to redirect text2term logs to stderr
+logging.basicConfig(level=logging.INFO, stream=sys.stderr)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 CATEGORIES_PATH = BASE_DIR / "data" / "categories.json"
 MAPPING_PATH    = BASE_DIR / "data" / "mappings.tsv"
@@ -102,6 +111,7 @@ def extract_annotation_gliner(text: str) -> list[dict]:
             "keyword":       ent.get("keyword", False),
             "inclusion":     ent.get("inclusion", False),
             "exclusion":     ent.get("exclusion", False),
+            "mapper":        "gliner",
         })
     return results
 
@@ -142,15 +152,73 @@ def extract_annotation_mesh(text: str) -> list[dict]:
             "keyword":       False,
             "inclusion":     False,
             "exclusion":     False,
+            "mapper":        "mesh",
         })
 
     return results
 
+def extract_entities(text: str) -> list[str]:
+    nlp = spacy.load("en_core_sci_lg")
+    doc = nlp(text)
+    entities = []
+    for ent in doc.ents:
+        entities.append(ent.text)
+    return entities
+
+def map_entities_to_terms(entities: list[str], ontology: str, threshold: float) -> pd.DataFrame:
+    df = text2term.map_terms(source_terms=entities,
+                             min_score=threshold,
+                             target_ontology=ontology)
+    return df
+
+def extract_annotation_t2t(text: str, ontology=None) -> list[dict]:
+    """
+    Use entity extraction and mapping to ontology terms.
+    Output is compatible with extract_annotation_mesh and extract_annotation_gliner.
+    By default, uses open_neuro_mesh.owl in data/ontologies/.
+    Uses mesh_2_onvoc.tsv to map ontology (MeSH) IDs to controlled vocabulary IDs.
+    """
+    if ontology is None:
+        ontology = str(BASE_DIR / "data" / "ontologies" / "open_neuro_mesh.owl")
+    entities = extract_entities(text)
+    df = map_entities_to_terms(entities, ontology, threshold=0.9)
+    # Build mesh_id -> vocab_id map from mesh_2_onvoc.tsv
+    mesh2onvoc_path = BASE_DIR / "data" / "ontologies" / "mesh_2_onvoc.tsv"
+    meshid_to_vocab_id = {}
+    with open(mesh2onvoc_path, encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter="\t")
+        for row in reader:
+            meshid = row["mesh_id"]
+            vocab_id = row["vocabulary_id"]
+            meshid_to_vocab_id[meshid] = vocab_id
+    results = []
+    for _, row in df.iterrows():
+        mesh_id = row.get("Mapped Term CURIE", "")
+        vocab_id = meshid_to_vocab_id.get(mesh_id, "")
+        if not vocab_id:
+            continue  # Only include if mapping exists
+        cat_lbl, sub_lbl, term_lbl = ("", "", "")
+        if vocab_id:
+            cat_lbl, sub_lbl, term_lbl = vocab_label_hierarchy.get(vocab_id, ("", "", ""))
+        results.append({
+            "text": row.get("Source Term", ""),
+            "vocabulary_id": vocab_id,
+            "category": cat_lbl,
+            "subcategory": sub_lbl,
+            "term": term_lbl,
+            "score": row.get("Mapping Score", 0),
+            "keyword": False,
+            "inclusion": False,
+            "exclusion": False,
+            "mapper": "t2t",
+        })
+    return results
+
 def extract_annotations(text: str) -> list[dict]:
     """
-    Run both the GLiNER-based vocabulary annotator and the MeSH-based annotator.
+    Run the GLiNER-based vocabulary annotator, the MeSH-based annotator, and the t2t-based annotator.
     """
-    raw_results = extract_annotation_gliner(text) + extract_annotation_mesh(text)
+    raw_results = extract_annotation_gliner(text) + extract_annotation_mesh(text) + extract_annotation_t2t(text)
     seen = set()
     deduped = []
     for ann in raw_results:
