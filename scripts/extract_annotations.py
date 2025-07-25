@@ -13,6 +13,8 @@ sys.path.append(str(Path(__file__).parent))
 import text2term
 import pandas as pd
 import logging
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 # Configure logging to redirect text2term logs to stderr
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)
@@ -216,9 +218,31 @@ def extract_annotation_t2t(text: str, ontology=None) -> list[dict]:
 
 def extract_annotations(text: str) -> list[dict]:
     """
-    Run the GLiNER-based vocabulary annotator, the MeSH-based annotator, and the t2t-based annotator.
+    Run the GLiNER-based vocabulary annotator, the MeSH-based annotator, and the t2t-based annotator in parallel.
     """
-    raw_results = extract_annotation_gliner(text) + extract_annotation_mesh(text) + extract_annotation_t2t(text)
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        # Submit all three tasks
+        gliner_future = executor.submit(extract_annotation_gliner, text)
+        mesh_future = executor.submit(extract_annotation_mesh, text)
+        t2t_future = executor.submit(extract_annotation_t2t, text)
+        
+        # Collect results
+        raw_results = []
+        try:
+            raw_results.extend(gliner_future.result())
+        except Exception as e:
+            print(f"GLiNER extraction failed: {e}", file=sys.stderr)
+        
+        try:
+            raw_results.extend(mesh_future.result())
+        except Exception as e:
+            print(f"MeSH extraction failed: {e}", file=sys.stderr)
+        
+        try:
+            raw_results.extend(t2t_future.result())
+        except Exception as e:
+            print(f"T2T extraction failed: {e}", file=sys.stderr)
+    
     seen = set()
     deduped = []
     for ann in raw_results:
