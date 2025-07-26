@@ -127,14 +127,14 @@ export default function DatasetFilter({
   const termRows = sortedExtract.filter(item => item.term)
   const subcategoryRows = sortedExtract.filter(item =>
     item.subcategory && !item.term &&
-    // Exclude if same string and subcategory appear in termRows
-    !termRows.some(t => t.text === item.text && t.subcategory === item.subcategory)
+    // Exclude only if it's the exact same item (by ID) that appears in termRows, not just same text/subcategory
+    !termRows.some(t => getAnnotationId(t) === getAnnotationId(item))
   )
   const categoryRows = sortedExtract.filter(item =>
     item.category && !item.subcategory && !item.term &&
-    // Exclude if same string and category appear in termRows or subcategoryRows
-    !termRows.some(t => t.text === item.text && t.category === item.category) &&
-    !subcategoryRows.some(s => s.text === item.text && s.category === item.category)
+    // Exclude only if it's the exact same item (by ID) that appears in termRows or subcategoryRows
+    !termRows.some(t => getAnnotationId(t) === getAnnotationId(item)) &&
+    !subcategoryRows.some(s => getAnnotationId(s) === getAnnotationId(item))
   )
 
   // Build color maps for each group using the filtered table order
@@ -231,7 +231,12 @@ export default function DatasetFilter({
         body: JSON.stringify({ text: note }),
       })
       const data = await res.json()
-      setExtract(data.result)
+      // Assign unique IDs to each extracted item to ensure proper duplication
+      const extractedWithIds = data.result.map((item: AnnotationItem, index: number) => ({
+        ...item,
+        id: `extracted_${Date.now()}_${index}_${Math.random().toString(36).substr(2, 9)}`
+      }))
+      setExtract(extractedWithIds)
     } catch (err) {
       console.error('Error extracting annotations', err)
     } finally {
@@ -254,15 +259,9 @@ export default function DatasetFilter({
     // Optionally show a success message
   }
 
-  // Row actions: remove or duplicate
+  // Row actions: remove (old index-based functions kept for potential fallback)
   const handleRemoveExtract = (i: number) =>
     setExtract(prev => prev.filter((_, idx) => idx !== i))
-  const handleDuplicateExtract = (i: number) =>
-    setExtract(prev => {
-      const copy = [...prev]
-      copy.splice(i + 1, 0, { ...prev[i] })
-      return copy
-    })
 
   // Toggle flags
   const toggleFlag = (
@@ -301,8 +300,18 @@ export default function DatasetFilter({
   // Helper to get a unique id for an annotation item
   function getAnnotationId(item: AnnotationItem) {
     if (item.id) return item.id;
-    // Generate a unique ID based on content and timestamp if no ID exists
-    return `${item.text}__${item.category}__${item.subcategory}__${item.term}__${Date.now()}`;
+    // Generate a unique ID based on content, timestamp, and randomness if no ID exists
+    return `${item.text}__${item.category}__${item.subcategory}__${item.term}__${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  // Helper to detect duplicate rows based on content
+  function isDuplicateRow(item: AnnotationItem, allRows: AnnotationItem[]): boolean {
+    const itemKey = `${item.text}__${item.category}__${item.subcategory}__${item.term}`;
+    const duplicates = allRows.filter(row => {
+      const rowKey = `${row.text}__${row.category}__${row.subcategory}__${row.term}`;
+      return rowKey === itemKey;
+    });
+    return duplicates.length > 1;
   }
 
   // Update handlers to use id
@@ -452,7 +461,7 @@ export default function DatasetFilter({
     return (
       <div className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
         <div className="font-semibold text-sm bg-gray-100 px-2 py-1 sticky top-0 z-20 flex items-center justify-between">
-          <span>Categories</span>
+          <span>Categories <span className="text-xs text-gray-600">(🔴 = duplicates)</span></span>
           <button
             className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
             onClick={onToggleCollapse}
@@ -478,8 +487,9 @@ export default function DatasetFilter({
             <tbody>
               {rows.map((item, idx) => {
                 const hl = catColorMap[item.text + '||' + (item.category || '')]
+                const isDuplicate = isDuplicateRow(item, sortedExtract)
                 return (
-                  <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
+                  <tr key={getAnnotationId(item)} className={`hover:bg-gray-50 even:bg-gray-50 group ${isDuplicate ? 'border-2 border-red-500' : ''}`}>
                     <td className={`sticky left-0 z-10 border px-2 py-1`} style={{ background: hl, color: 'black' }}>{item.text}</td>
                     <td className="border px-1 py-1">
                       <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
@@ -529,7 +539,7 @@ export default function DatasetFilter({
     return (
       <div ref={tableRef} className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
         <div className="font-semibold text-sm bg-gray-100 px-2 py-1 sticky top-0 z-20 flex items-center justify-between">
-          <span>Subcategories</span>
+          <span>Subcategories <span className="text-xs text-gray-600">(🔴 = duplicates)</span></span>
           <button
             className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
             onClick={onToggleCollapse}
@@ -555,8 +565,9 @@ export default function DatasetFilter({
             <tbody>
               {rows.map((item, idx) => {
                 const hl = subcatColorMap[item.text + '||' + (item.subcategory || '')]
+                const isDuplicate = isDuplicateRow(item, sortedExtract)
                 return (
-                  <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
+                  <tr key={getAnnotationId(item)} className={`hover:bg-gray-50 even:bg-gray-50 group ${isDuplicate ? 'border-2 border-red-500' : ''}`}>
                     <td className={`sticky left-0 z-10 border px-2 py-1`} style={{ background: hl, color: 'black' }}>{item.text}</td>
                     <td className="border px-1 py-1">
                       <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
@@ -606,7 +617,7 @@ export default function DatasetFilter({
     return (
       <div ref={tableRef} className={`flex flex-col mb-4 rounded border ${!collapsed ? 'min-h-[12rem] max-h-[24rem] overflow-y-auto' : ''}`}>
         <div className="font-semibold text-sm bg-gray-100 px-2 py-1 sticky top-0 z-20 flex items-center justify-between">
-          <span>Terms</span>
+          <span>Terms <span className="text-xs text-gray-600">(🔴 = duplicates)</span></span>
           <button
             className="ml-2 px-2 py-0.5 rounded text-xs border bg-white hover:bg-gray-200"
             onClick={onToggleCollapse}
@@ -632,8 +643,9 @@ export default function DatasetFilter({
             <tbody>
               {rows.map((item, idx) => {
                 const hl = termColorMap[item.text + '||' + (item.term || '')]
+                const isDuplicate = isDuplicateRow(item, sortedExtract)
                 return (
-                  <tr key={getAnnotationId(item)} className="hover:bg-gray-50 even:bg-gray-50 group">
+                  <tr key={getAnnotationId(item)} className={`hover:bg-gray-50 even:bg-gray-50 group ${isDuplicate ? 'border-2 border-red-500' : ''}`}>
                     <td className={`sticky left-0 z-10 border px-2 py-1`} style={{ background: hl, color: 'black' }}>{item.text}</td>
                     <td className="border px-1 py-1">
                       <select value={item.category} onChange={e => handlers.handleCategoryChange(getAnnotationId(item), e.target.value)} className="border rounded px-1 py-0.5">
