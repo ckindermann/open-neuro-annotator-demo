@@ -292,7 +292,7 @@ export default function Home() {
             />
             <button
               onClick={() => setRightPanelCollapsed(true)}
-              className="absolute top-2 left-2 w-6 h-6 bg-white hover:bg-gray-100 border rounded flex items-center justify-center text-gray-600 text-sm transition-colors"
+              className="absolute top-4 left-2 w-6 h-6 bg-white hover:bg-gray-100 border rounded flex items-center justify-center text-gray-600 text-sm transition-colors z-10"
               title="Collapse dataset details panel"
             >
               →
