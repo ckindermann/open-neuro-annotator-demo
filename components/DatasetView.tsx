@@ -11,7 +11,7 @@ export default function DatasetView({ selectedDataset, onAnnotate }: DatasetView
   }
 
   return (
-    <div className="relative p-4 h-full" style={{ paddingTop: '3rem', marginTop: '1rem' }}>
+    <div className="relative p-4 h-full" style={{ paddingTop: '3rem', marginTop: '1rem', maxWidth: '600px' }}>
       <h2 className="text-xl font-semibold mb-2">{selectedDataset.label}</h2>
       <p className="mb-2">{selectedDataset.description}</p>
       {selectedDataset.authors && (
